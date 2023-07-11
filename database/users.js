@@ -1,4 +1,5 @@
-const mysql = require('mysql');
+import mysql from 'mysql'
+
 
 const connection = mysql.createConnection({
     host: 'sql7.freesqldatabase.com',
@@ -6,7 +7,7 @@ const connection = mysql.createConnection({
     password: 'QibQTRHnma',
     database: 'sql7632054'
 });
-function add_user(email, username, password) {
+export function add_user(email, username, password) {
     connection.connect((error) => {
         if (error) {
             console.error('Ошибка подключения к базе данных:', error);
@@ -37,7 +38,7 @@ function add_user(email, username, password) {
         });
     });
 }
-function checkPassword(username, password) {
+export function checkPassword(username, password) {
     return new Promise((resolve, reject) => {
         connection.connect((error) => {
             if (error) {
