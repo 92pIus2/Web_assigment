@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "NUP web assigment",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "node ./app.js",
     "dev": "nodemon ./app.js",
@@ -11,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "mysql": "^2.18.1"
   }
