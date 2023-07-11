@@ -6,7 +6,7 @@ const connection = mysql.createConnection({
     password: 'QibQTRHnma',
     database: 'sql7632054'
 });
-export function add_user(email, username, password) {
+function add_user(email, username, password) {
     connection.connect((error) => {
         if (error) {
             console.error('Ошибка подключения к базе данных:', error);
@@ -19,7 +19,7 @@ export function add_user(email, username, password) {
 
         // SQL-запрос для вставки данных
         const insertQuery = `
-            INSERT INTO users (column1, column2, column3)
+            INSERT INTO users (email, username, password)
             VALUES (?, ?, ?)
         `;
         const values = [email, username, password];
@@ -37,3 +37,54 @@ export function add_user(email, username, password) {
         });
     });
 }
+function checkPassword(username, password) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL2');
+
+            // SQL-запрос для выборки пользователя по имени пользователя (username)
+            const selectQuery = `
+                SELECT * FROM users WHERE username = ?
+            `;
+            const values = [username];
+
+            // Выполнение SQL-запроса для выборки пользователя
+            connection.query(selectQuery, values, (error, results) => {
+
+                if (error) {
+                    console.error('Ошибка выборки данных:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Проверка пароля
+                if (results.length === 0) {
+                    // Пользователь не найден
+                    resolve(false);
+                } else {
+                    // Пользователь найден, сравниваем пароли
+                    const user = results[0];
+
+                    if (user.password === password) {
+                        console.log('Пароль верный')
+                        resolve(true); // Пароль совпадает
+
+                    } else {
+                        console.log('Пароль неверный')
+                        resolve(false); // Пароль не совпадает
+
+                    }
+                }
+
+                connection.end();
+            });
+        });
+    });
+}
+
