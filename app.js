@@ -16,13 +16,6 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, './first version of view.html'));
 });
 
-const items = [
-    {id: 1, name: 'Item 1', photo: 'template.png', description: 'Description 1', price: 10.99},
-    {id: 2, name: 'Item 2', photo: 'template.png', description: 'Description 2', price: 19.99},
-    {id: 3, name: 'Item 3', photo: 'template.png', description: 'Description 3', price: 19.99},
-    // Add more items as needed
-];
-
 // API endpoint to retrieve items
 app.get('/api/content', function (req, res) {
     get_products_by_genre('Hip-Hop').then((products) => {

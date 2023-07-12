@@ -86,8 +86,10 @@
                 const item = items[j];
                 const cell = document.createElement('td');
                 cell.innerHTML = `
-            <strong>${item.album} - ${item.artist}</strong>
+            <p><strong>${item.album}</strong></p>
+            <p><strong>${item.artist}</strong></p>
             <p><img src="../template.png", alt="image"></p>
+            <p>${item.genre}</p>
             <p>${item.price}</p>
             <button onclick="addToCart('${item.id}')">Add to Cart</button>
           `;
