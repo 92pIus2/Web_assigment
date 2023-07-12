@@ -76,6 +76,42 @@ export function update_user_by_email(email, new_username, new_password) {
     });
 }
 
+export function delete_user(identifier) {
+    connection.connect((error) => {
+        if (error) {
+            console.error('Ошибка подключения к базе данных:', error);
+            return;
+        }
+        console.log('Подключено к базе данных MySQL');
+
+        // Check if the identifier is an email or username
+        const isEmail = identifier.includes('@');
+        let deleteQuery, values;
+
+        if (isEmail) {
+            // Delete user by email
+            deleteQuery = 'DELETE FROM users WHERE email = ?';
+            values = [identifier];
+        } else {
+            // Delete user by username
+            deleteQuery = 'DELETE FROM users WHERE username = ?';
+            values = [identifier];
+        }
+
+        // Execute the delete query
+        connection.query(deleteQuery, values, (error) => {
+            if (error) {
+                console.error('Ошибка при удалении пользователя:', error);
+                connection.end();
+                return;
+            }
+            console.log('Пользователь успешно удален');
+
+            connection.end();
+        });
+    });
+}
+
 export function checkPassword(username, password) {
     return new Promise((resolve, reject) => {
         connection.connect((error) => {

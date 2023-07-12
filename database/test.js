@@ -121,7 +121,7 @@ function print_order_items() {
   });
 }
 
-print_order_items()
+print_users()
 
 /*connection.connect((error) => {
   if (error) {
