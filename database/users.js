@@ -163,3 +163,78 @@ export function checkPassword(username, password) {
     });
 }
 
+export function get_user_by_email(email) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения пользователя по email
+            const selectQuery = 'SELECT * FROM users WHERE email = ?';
+
+            // Выполнение SQL-запроса для получения пользователя
+            connection.query(selectQuery, [email], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении пользователя:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results[0]);
+
+                connection.end();
+            });
+        });
+    });
+}
+
+export function get_user_by_username(username) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения пользователя по username
+            const selectQuery = 'SELECT * FROM users WHERE username = ?';
+
+            // Выполнение SQL-запроса для получения пользователя
+            connection.query(selectQuery, [username], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении пользователя:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results[0]);
+
+                connection.end();
+            });
+        });
+    });
+}
+
+/*
+get_user_by_email('test@test.test').then((user) => {
+    console.log(user); // Log the retrieved user by email
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+
+get_user_by_username('admin').then((user) => {
+    console.log(user); // Log the retrieved user by username
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+*/

@@ -84,5 +84,3 @@ export function delete_order_item(id) {
         });
     });
 }
-
-delete_order_item(2)
