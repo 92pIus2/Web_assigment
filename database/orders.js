@@ -60,3 +60,28 @@ export function update_order(id, new_status, new_total, new_email) {
     });
 }
 
+export function delete_order(id) {
+    connection.connect((error) => {
+        if (error) {
+            console.error('Ошибка подключения к базе данных:', error);
+            return;
+        }
+        console.log('Подключено к базе данных MySQL');
+
+        // SQL-запрос для удаления данных
+        const deleteQuery = 'DELETE FROM orders WHERE id = ?';
+
+        // Выполнение SQL-запроса для удаления данных
+        connection.query(deleteQuery, [id], (error, results) => {
+            if (error) {
+                console.error('Ошибка при удалении заказа:', error);
+                connection.end();
+                return;
+            }
+            console.log('Заказ успешно удален');
+
+            connection.end();
+        });
+    });
+}
+
