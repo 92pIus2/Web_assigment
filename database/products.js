@@ -1,4 +1,5 @@
 import mysql from 'mysql'
+import {delete_order} from "./orders.js";
 
 
 const connection = mysql.createConnection({
@@ -56,4 +57,27 @@ export function update_product(id, new_artist, new_album, new_price, new_genre) 
     });
 }
 
-update_product(1, 'Morgenshtern', 'The Last One', 30, 'Hip-Hop');
+export function delete_product(id) {
+    connection.connect((error) => {
+        if (error) {
+            console.error('Ошибка подключения к базе данных:', error);
+            return;
+        }
+        console.log('Подключено к базе данных MySQL');
+
+        // SQL-запрос для удаления данных
+        const deleteQuery = 'DELETE FROM products WHERE id = ?';
+
+        // Выполнение SQL-запроса для удаления данных
+        connection.query(deleteQuery, [id], (error, results) => {
+            if (error) {
+                console.error('Ошибка при удалении товара:', error);
+                connection.end();
+                return;
+            }
+            console.log('Товар успешно удален');
+
+            connection.end();
+        });
+    });
+}

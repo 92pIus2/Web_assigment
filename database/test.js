@@ -121,7 +121,7 @@ function print_order_items() {
   });
 }
 
-print_orders()
+print_products()
 
 /*connection.connect((error) => {
   if (error) {
