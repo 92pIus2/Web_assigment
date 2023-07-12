@@ -25,13 +25,12 @@ const items = [
 
 // API endpoint to retrieve items
 app.get('/api/content', function (req, res) {
-    const items = get_products_by_genre('*').then((products) => {
+    get_products_by_genre('Hip-Hop').then((products) => {
         console.log(products); // Log the retrieved products by genre
+        res.json(products);
     }).catch((error) => {
         console.error(error); // Handle any errors
     });
-    console.log(items);
-    res.json(items);
 });
 
 app.get('/content', (req, res) => {
