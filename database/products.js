@@ -81,3 +81,115 @@ export function delete_product(id) {
         });
     });
 }
+
+export function get_product_by_id(id) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения товара по ID
+            const selectQuery = 'SELECT * FROM products WHERE id = ?';
+
+            // Выполнение SQL-запроса для получения товара
+            connection.query(selectQuery, [id], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении товара:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results[0]);
+
+                connection.end();
+            });
+        });
+    });
+}
+
+export function get_products_by_artist(artist) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения товаров по артисту
+            const selectQuery = 'SELECT * FROM products WHERE artist = ?';
+
+            // Выполнение SQL-запроса для получения товаров
+            connection.query(selectQuery, [artist], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении товаров:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results);
+
+                connection.end();
+            });
+        });
+    });
+}
+
+export function get_products_by_genre(genre) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения товаров по жанру
+            const selectQuery = 'SELECT * FROM products WHERE genre = ?';
+
+            // Выполнение SQL-запроса для получения товаров
+            connection.query(selectQuery, [genre], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении товаров:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results);
+
+                connection.end();
+            });
+        });
+    });
+}
+/*
+get_product_by_id(1).then((product) => {
+    console.log(product); // Log the retrieved product by ID
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+
+get_products_by_artist('Tyler, the Creator').then((products) => {
+    console.log(products); // Log the retrieved products by artist
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+
+get_products_by_genre('Hip-Hop').then((products) => {
+    console.log(products); // Log the retrieved products by genre
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+*/
