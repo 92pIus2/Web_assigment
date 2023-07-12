@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 //order_id
 //product_id
 //count
-export function add_order(id, email){
+export function add_order_item(id, order_id, product_id, count){
     connection.connect((error) => {
         if (error) {
             console.error('Ошибка подключения к базе данных:', error);
@@ -22,10 +22,10 @@ export function add_order(id, email){
 
         // SQL-запрос для вставки данных
         const insertQuery = `
-      INSERT INTO orders (id, status, total, user_email)
+      INSERT INTO order_items (id, order_id, product_id, count)
       VALUES (?, ?, ?, ?)
     `;
-        const values = [id, 'in_cart', 0, email];
+        const values = [id, order_id, product_id, count];
 
         // Выполнение SQL-запроса для вставки данных
         connection.query(insertQuery, values, (error) => {
@@ -59,4 +59,3 @@ export function update_order(id, new_status, new_total, new_email) {
         connection.end();
     });
 }
-

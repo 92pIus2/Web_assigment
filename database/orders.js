@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 //status
 //total
 //user_email
-export function add_order(id, email){
+export function add_order(id, email, total){
     connection.connect((error) => {
         if (error) {
             console.error('Ошибка подключения к базе данных:', error);
@@ -25,7 +25,7 @@ export function add_order(id, email){
       INSERT INTO orders (id, status, total, user_email)
       VALUES (?, ?, ?, ?)
     `;
-        const values = [id, 'in_cart', 0, email];
+        const values = [id, 'in_cart', total, email];
 
         // Выполнение SQL-запроса для вставки данных
         connection.query(insertQuery, values, (error) => {

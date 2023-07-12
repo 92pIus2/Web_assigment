@@ -94,7 +94,34 @@ function print_orders() {
   });
 }
 
-print_users()
+function print_order_items() {
+  connection.connect((error) => {
+    if (error) {
+      console.error('Ошибка подключения к базе данных:', error);
+      return;
+    }
+    console.log('Подключено к базе данных MySQL');
+
+
+
+    // SQL-запрос для выборки данных
+    const selectQuery = 'SELECT * FROM order_items';
+
+    // Выполнение SQL-запроса для выборки данных
+    connection.query(selectQuery, (error, results) => {
+      if (error) {
+        console.error('Ошибка выборки данных:', error);
+      } else {
+        console.log('Результаты выборки:');
+        console.log(results);
+      }
+      connection.end();
+    });
+
+  });
+}
+
+print_order_items()
 
 /*connection.connect((error) => {
   if (error) {
