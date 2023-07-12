@@ -104,13 +104,17 @@ print_users()
   console.log('Подключено к базе данных MySQL');
 
   //id
-  //status
+  //order_id
+  //product_id
+  //count
 
   // SQL-запрос для создания таблицы
   const createTableQuery = `
-    CREATE TABLE orders (
+    CREATE TABLE order_items (
       id INT,
-      status VARCHAR(255),
+      order_id INT,
+      product_id INT,
+      count INT,
       PRIMARY KEY (id)
     )
   `;
@@ -126,9 +130,9 @@ print_users()
 
     // SQL-запрос для вставки данных
     const insertQuery = `
-      INSERT INTO orders (id, status) VALUES (?, ?)
+      INSERT INTO order_items (id, order_id, product_id, count) VALUES (?, ?, ?, ?)
     `;
-    const values = [1, 'in_cart'];
+    const values = [1, 1, 1, 10];
 
     // Выполнение SQL-запроса для вставки данных
     connection.query(insertQuery, values, (error) => {
@@ -140,7 +144,7 @@ print_users()
       console.log('Данные вставлены успешно');
 
       // SQL-запрос для выборки данных
-      const selectQuery = 'SELECT * FROM orders';
+      const selectQuery = 'SELECT * FROM order_items';
 
       // Выполнение SQL-запроса для выборки данных
       connection.query(selectQuery, (error, results) => {
@@ -154,8 +158,8 @@ print_users()
       });
     });
   });
-});
-*/
+});*/
+
 
 
 /*
