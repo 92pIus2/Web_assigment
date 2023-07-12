@@ -65,3 +65,94 @@ function print_products() {
 
   });
 }
+
+function print_orders() {
+  connection.connect((error) => {
+    if (error) {
+      console.error('Ошибка подключения к базе данных:', error);
+      return;
+    }
+    console.log('Подключено к базе данных MySQL');
+    //id
+    //status
+
+
+    // SQL-запрос для выборки данных
+    const selectQuery = 'SELECT * FROM orders';
+
+    // Выполнение SQL-запроса для выборки данных
+    connection.query(selectQuery, (error, results) => {
+      if (error) {
+        console.error('Ошибка выборки данных:', error);
+      } else {
+        console.log('Результаты выборки:');
+        console.log(results);
+      }
+      connection.end();
+    });
+
+  });
+}
+
+print_users()
+
+/*connection.connect((error) => {
+  if (error) {
+    console.error('Ошибка подключения к базе данных:', error);
+    return;
+  }
+  console.log('Подключено к базе данных MySQL');
+
+  //id
+  //status
+
+  // SQL-запрос для создания таблицы
+  const createTableQuery = `
+    CREATE TABLE orders (
+      id INT,
+      status VARCHAR(255),
+      PRIMARY KEY (id)
+    )
+  `;
+
+  // Выполнение SQL-запроса для создания таблицы
+  connection.query(createTableQuery, (error) => {
+    if (error) {
+      console.error('Ошибка создания таблицы:', error);
+      connection.end();
+      return;
+    }
+    console.log('Таблица создана успешно');
+
+    // SQL-запрос для вставки данных
+    const insertQuery = `
+      INSERT INTO orders (id, status) VALUES (?, ?)
+    `;
+    const values = [1, 'in_cart'];
+
+    // Выполнение SQL-запроса для вставки данных
+    connection.query(insertQuery, values, (error) => {
+      if (error) {
+        console.error('Ошибка вставки данных:', error);
+        connection.end();
+        return;
+      }
+      console.log('Данные вставлены успешно');
+
+      // SQL-запрос для выборки данных
+      const selectQuery = 'SELECT * FROM orders';
+
+      // Выполнение SQL-запроса для выборки данных
+      connection.query(selectQuery, (error, results) => {
+        if (error) {
+          console.error('Ошибка выборки данных:', error);
+        } else {
+          console.log('Результаты выборки:');
+          console.log(results);
+        }
+        connection.end();
+      });
+    });
+  });
+});
+*/

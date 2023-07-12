@@ -38,6 +38,44 @@ export function add_user(email, username, password) {
         });
     });
 }
+export function update_user_by_username(username, new_email, new_password) {
+
+// Выполняем SQL-запрос для обновления данных
+    const updateQuery = 'UPDATE users SET email = ?, password = ? WHERE username = ?';
+
+    connection.query(updateQuery, [new_email, new_password, username], (error, results) => {
+        if (error) {
+            console.error('Ошибка при обновлении данных:', error);
+            // Обработка ошибки
+        } else {
+            console.log('Данные успешно обновлены!');
+            // Дополнительные действия при успешном обновлении данных
+        }
+
+        // Закрываем подключение к базе данных
+        connection.end();
+    });
+}
+
+export function update_user_by_email(email, new_username, new_password) {
+
+// Выполняем SQL-запрос для обновления данных
+    const updateQuery = 'UPDATE users SET username = ?, password = ? WHERE email = ?';
+
+    connection.query(updateQuery, [new_username, new_password, email], (error, results) => {
+        if (error) {
+            console.error('Ошибка при обновлении данных:', error);
+            // Обработка ошибки
+        } else {
+            console.log('Данные успешно обновлены!');
+            // Дополнительные действия при успешном обновлении данных
+        }
+
+        // Закрываем подключение к базе данных
+        connection.end();
+    });
+}
+
 export function checkPassword(username, password) {
     return new Promise((resolve, reject) => {
         connection.connect((error) => {

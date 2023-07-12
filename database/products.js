@@ -36,3 +36,24 @@ export function add_product(id, artist, album, price, genre){
 
     });
 }
+
+export function update_product(id, new_artist, new_album, new_price, new_genre) {
+
+// Выполняем SQL-запрос для обновления данных
+    const updateQuery = 'UPDATE products SET artist = ?, album = ?, price = ?, genre = ? WHERE id = ?';
+
+    connection.query(updateQuery, [new_artist, new_album, new_price, new_genre, id], (error, results) => {
+        if (error) {
+            console.error('Ошибка при обновлении данных:', error);
+            // Обработка ошибки
+        } else {
+            console.log('Данные успешно обновлены!');
+            // Дополнительные действия при успешном обновлении данных
+        }
+
+        // Закрываем подключение к базе данных
+        connection.end();
+    });
+}
+
+update_product(1, 'Morgenshtern', 'The Last One', 30, 'Hip-Hop');
