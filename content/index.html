@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Items</title>
+    <style>
+        body {
+            background-image: url("../fon.png");
+            font-family: Arial, sans-serif;
+            font-size: xx-large;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 10px;
+            resize: both;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #555;
+        }
+
+        td {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Online Store</h1>
+
+    <table id="itemsTable">
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function addToCart(itemId) {
+        fetch('/add_to_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'id': itemId
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data if needed
+                console.log(data);
+            })
+            .catch(error => console.log(error));
+    }
+
+    function addItems(items) {
+        const tableBody = document.querySelector('#itemsTable tbody');
+
+        for (let i = 0; i < items.length; i += 2) {
+            const row = document.createElement('tr');
+
+            for (let j = i; j < i + 2 && j < items.length; j++) {
+                const item = items[j];
+                const cell = document.createElement('td');
+                cell.innerHTML = `
+            <strong>${item.name}</strong>
+            <p><img src="../template.png", alt="image"></p>
+            <p>${item.description}</p>
+            <p>${item.price}</p>
+            <button onclick="addToCart('${item.id}')">Add to Cart</button>
+          `;
+                row.appendChild(cell);
+            }
+
+            tableBody.appendChild(row);
+        }
+    }
+
+    // Fetch data from the server API
+    fetch('/api/content')
+        .then(response => response.json())
+        .then(data => {
+            addItems(data);
+        })
+        .catch(error => console.log(error));
+</script>
+</body>
+</html>
