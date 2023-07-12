@@ -85,3 +85,76 @@ export function delete_order(id) {
     });
 }
 
+export function get_order_by_id(id) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения заказа по ID
+            const selectQuery = 'SELECT * FROM orders WHERE id = ?';
+
+            // Выполнение SQL-запроса для получения заказа
+            connection.query(selectQuery, [id], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении заказа:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results[0]);
+
+                connection.end();
+            });
+        });
+    });
+}
+
+export function get_orders_by_user(email) {
+    return new Promise((resolve, reject) => {
+        connection.connect((error) => {
+            if (error) {
+                console.error('Ошибка подключения к базе данных:', error);
+                reject(error);
+                return;
+            }
+            console.log('Подключено к базе данных MySQL');
+
+            // SQL-запрос для получения заказов по email пользователя
+            const selectQuery = 'SELECT * FROM orders WHERE user_email = ?';
+
+            // Выполнение SQL-запроса для получения заказов
+            connection.query(selectQuery, [email], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении заказов:', error);
+                    connection.end();
+                    reject(error);
+                    return;
+                }
+
+                // Возвращаем результаты
+                resolve(results);
+
+                connection.end();
+            });
+        });
+    });
+}
+/*
+get_order_by_id(1).then((order) => {
+    console.log(order); // Log the retrieved order by ID
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+
+get_orders_by_user('test@test.test').then((orders) => {
+    console.log(orders); // Log the retrieved orders by user email
+}).catch((error) => {
+    console.error(error); // Handle any errors
+}); */
