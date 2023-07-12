@@ -156,3 +156,21 @@ print_users()
   });
 });
 */
+
+
+/*
+// Выполняем SQL-запрос для добавления столбца
+
+const alterTableQuery = 'ALTER TABLE orders ADD user_email VARCHAR(255)';
+connection.query(alterTableQuery, (error, results) => {
+  if (error) {
+    console.error('Ошибка при добавлении столбца:', error);
+    // Обработка ошибки
+  } else {
+    console.log('Столбец успешно добавлен!');
+    // Дополнительные действия при успешном добавлении столбца
+  }
+
+  // Закрываем подключение к базе данных
+  connection.end();
+}); */

@@ -7,7 +7,11 @@ const connection = mysql.createConnection({
     password: 'QibQTRHnma',
     database: 'sql7632054'
 });
-export function add_order(id){
+//id
+//status
+//total
+//user_email
+export function add_order(id, email){
     connection.connect((error) => {
         if (error) {
             console.error('Ошибка подключения к базе данных:', error);
@@ -18,10 +22,10 @@ export function add_order(id){
 
         // SQL-запрос для вставки данных
         const insertQuery = `
-      INSERT INTO products (id, artist, album, price, genre)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO orders (id, status, total, user_email)
+      VALUES (?, ?, ?, ?)
     `;
-        const values = [id, artist, album, price, genre];
+        const values = [id, 'in_cart', 0, email];
 
         // Выполнение SQL-запроса для вставки данных
         connection.query(insertQuery, values, (error) => {
@@ -37,12 +41,12 @@ export function add_order(id){
     });
 }
 
-export function update_order(id, new_status, new_total) {
+export function update_order(id, new_status, new_total, new_email) {
 
 // Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE orders SET status = ?, total = ? WHERE id = ?';
+    const updateQuery = 'UPDATE orders SET status = ?, total = ?, user_email = ? WHERE id = ?';
 
-    connection.query(updateQuery, [new_status, new_total, id], (error, results) => {
+    connection.query(updateQuery, [new_status, new_total, new_email, id], (error, results) => {
         if (error) {
             console.error('Ошибка при обновлении данных:', error);
             // Обработка ошибки
@@ -55,3 +59,4 @@ export function update_order(id, new_status, new_total) {
         connection.end();
     });
 }
+
