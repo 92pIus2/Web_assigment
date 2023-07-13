@@ -7,37 +7,34 @@ const connection = mysql.createConnection({
     password: 'QibQTRHnma',
     database: 'sql7632054'
 });
+
+connection.connect((error) => {
+    if (error) {
+        console.error('Ошибка подключения к базе данных:', error);
+        return;
+    }
+    console.log('Подключено к базе данных MySQL');
+});
+
 //id
 //status
 //total
 //user_email
 export function add_order(id, email, total){
-    connection.connect((error) => {
+    // SQL-запрос для вставки данных
+    const insertQuery = `
+  INSERT INTO orders (id, status, total, user_email)
+  VALUES (?, ?, ?, ?)
+`;
+    const values = [id, 'in_cart', total, email];
+
+    // Выполнение SQL-запроса для вставки данных
+    connection.query(insertQuery, values, (error) => {
         if (error) {
-            console.error('Ошибка подключения к базе данных:', error);
+            console.error('Ошибка вставки данных:', error);
             return;
         }
-        console.log('Подключено к базе данных MySQL');
-
-
-        // SQL-запрос для вставки данных
-        const insertQuery = `
-      INSERT INTO orders (id, status, total, user_email)
-      VALUES (?, ?, ?, ?)
-    `;
-        const values = [id, 'in_cart', total, email];
-
-        // Выполнение SQL-запроса для вставки данных
-        connection.query(insertQuery, values, (error) => {
-            if (error) {
-                console.error('Ошибка вставки данных:', error);
-                connection.end();
-                return;
-            }
-            console.log('Данные вставлены успешно');
-            connection.end();
-        });
-
+        console.log('Данные вставлены успешно');
     });
 }
 
@@ -54,95 +51,56 @@ export function update_order(id, new_status, new_total, new_email) {
             console.log('Данные успешно обновлены!');
             // Дополнительные действия при успешном обновлении данных
         }
-
-        // Закрываем подключение к базе данных
-        connection.end();
     });
 }
 
 export function delete_order(id) {
-    connection.connect((error) => {
+    // SQL-запрос для удаления данных
+    const deleteQuery = 'DELETE FROM orders WHERE id = ?';
+
+    // Выполнение SQL-запроса для удаления данных
+    connection.query(deleteQuery, [id], (error, results) => {
         if (error) {
-            console.error('Ошибка подключения к базе данных:', error);
+            console.error('Ошибка при удалении заказа:', error);
             return;
         }
-        console.log('Подключено к базе данных MySQL');
-
-        // SQL-запрос для удаления данных
-        const deleteQuery = 'DELETE FROM orders WHERE id = ?';
-
-        // Выполнение SQL-запроса для удаления данных
-        connection.query(deleteQuery, [id], (error, results) => {
-            if (error) {
-                console.error('Ошибка при удалении заказа:', error);
-                connection.end();
-                return;
-            }
-            console.log('Заказ успешно удален');
-
-            connection.end();
-        });
+        console.log('Заказ успешно удален');
     });
 }
 
 export function get_order_by_id(id) {
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
+        // SQL-запрос для получения заказа по ID
+        const selectQuery = 'SELECT * FROM orders WHERE id = ?';
+
+        // Выполнение SQL-запроса для получения заказа
+        connection.query(selectQuery, [id], (error, results) => {
             if (error) {
-                console.error('Ошибка подключения к базе данных:', error);
+                console.error('Ошибка при получении заказа:', error);
                 reject(error);
                 return;
             }
-            console.log('Подключено к базе данных MySQL');
 
-            // SQL-запрос для получения заказа по ID
-            const selectQuery = 'SELECT * FROM orders WHERE id = ?';
-
-            // Выполнение SQL-запроса для получения заказа
-            connection.query(selectQuery, [id], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении заказа:', error);
-                    connection.end();
-                    reject(error);
-                    return;
-                }
-
-                // Возвращаем результаты
-                resolve(results[0]);
-
-                connection.end();
-            });
+            // Возвращаем результаты
+            resolve(results[0]);
         });
     });
 }
 
 export function get_orders_by_user(email) {
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
+        // SQL-запрос для получения заказов по email пользователя
+        const selectQuery = 'SELECT * FROM orders WHERE user_email = ?';
+
+        // Выполнение SQL-запроса для получения заказов
+        connection.query(selectQuery, [email], (error, results) => {
             if (error) {
-                console.error('Ошибка подключения к базе данных:', error);
+                console.error('Ошибка при получении заказов:', error);
                 reject(error);
                 return;
             }
-            console.log('Подключено к базе данных MySQL');
-
-            // SQL-запрос для получения заказов по email пользователя
-            const selectQuery = 'SELECT * FROM orders WHERE user_email = ?';
-
-            // Выполнение SQL-запроса для получения заказов
-            connection.query(selectQuery, [email], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении заказов:', error);
-                    connection.end();
-                    reject(error);
-                    return;
-                }
-
-                // Возвращаем результаты
-                resolve(results);
-
-                connection.end();
-            });
+            // Возвращаем результаты
+            resolve(results);
         });
     });
 }

@@ -8,33 +8,30 @@ const connection = mysql.createConnection({
     password: 'QibQTRHnma',
     database: 'sql7632054'
 });
+
+connection.connect((error) => {
+    if (error) {
+        console.error('Ошибка подключения к базе данных:', error);
+        return;
+    }
+    console.log('Подключено к базе данных MySQL');
+});
+
 export function add_product(id, artist, album, price, genre){
-    connection.connect((error) => {
+    // SQL-запрос для вставки данных
+    const insertQuery = `
+  INSERT INTO products (id, artist, album, price, genre)
+  VALUES (?, ?, ?, ?, ?)
+`;
+    const values = [id, artist, album, price, genre];
+
+    // Выполнение SQL-запроса для вставки данных
+    connection.query(insertQuery, values, (error) => {
         if (error) {
-            console.error('Ошибка подключения к базе данных:', error);
+            console.error('Ошибка вставки данных:', error);
             return;
         }
-        console.log('Подключено к базе данных MySQL');
-
-
-        // SQL-запрос для вставки данных
-        const insertQuery = `
-      INSERT INTO products (id, artist, album, price, genre)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-        const values = [id, artist, album, price, genre];
-
-        // Выполнение SQL-запроса для вставки данных
-        connection.query(insertQuery, values, (error) => {
-            if (error) {
-                console.error('Ошибка вставки данных:', error);
-                connection.end();
-                return;
-            }
-            console.log('Данные вставлены успешно');
-            connection.end();
-        });
-
+        console.log('Данные вставлены успешно');
     });
 }
 
@@ -51,126 +48,76 @@ export function update_product(id, new_artist, new_album, new_price, new_genre) 
             console.log('Данные успешно обновлены!');
             // Дополнительные действия при успешном обновлении данных
         }
-
-        // Закрываем подключение к базе данных
-        connection.end();
     });
 }
 
 export function delete_product(id) {
-    connection.connect((error) => {
+    // SQL-запрос для удаления данных
+    const deleteQuery = 'DELETE FROM products WHERE id = ?';
+
+    // Выполнение SQL-запроса для удаления данных
+    connection.query(deleteQuery, [id], (error, results) => {
         if (error) {
-            console.error('Ошибка подключения к базе данных:', error);
+            console.error('Ошибка при удалении товара:', error);
             return;
         }
-        console.log('Подключено к базе данных MySQL');
-
-        // SQL-запрос для удаления данных
-        const deleteQuery = 'DELETE FROM products WHERE id = ?';
-
-        // Выполнение SQL-запроса для удаления данных
-        connection.query(deleteQuery, [id], (error, results) => {
-            if (error) {
-                console.error('Ошибка при удалении товара:', error);
-                connection.end();
-                return;
-            }
-            console.log('Товар успешно удален');
-
-            connection.end();
-        });
+        console.log('Товар успешно удален');
     });
 }
 
 export function get_product_by_id(id) {
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
+        // SQL-запрос для получения товара по ID
+        const selectQuery = 'SELECT * FROM products WHERE id = ?';
+
+        // Выполнение SQL-запроса для получения товара
+        connection.query(selectQuery, [id], (error, results) => {
             if (error) {
-                console.error('Ошибка подключения к базе данных:', error);
+                console.error('Ошибка при получении товара:', error);
                 reject(error);
                 return;
             }
-            console.log('Подключено к базе данных MySQL');
 
-            // SQL-запрос для получения товара по ID
-            const selectQuery = 'SELECT * FROM products WHERE id = ?';
-
-            // Выполнение SQL-запроса для получения товара
-            connection.query(selectQuery, [id], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении товара:', error);
-                    connection.end();
-                    reject(error);
-                    return;
-                }
-
-                // Возвращаем результаты
-                resolve(results[0]);
-
-                connection.end();
-            });
+            // Возвращаем результаты
+            resolve(results[0]);
         });
     });
 }
 
 export function get_products_by_artist(artist) {
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
+        // SQL-запрос для получения товаров по артисту
+        const selectQuery = 'SELECT * FROM products WHERE artist = ?';
+
+        // Выполнение SQL-запроса для получения товаров
+        connection.query(selectQuery, [artist], (error, results) => {
             if (error) {
-                console.error('Ошибка подключения к базе данных:', error);
+                console.error('Ошибка при получении товаров:', error);
                 reject(error);
                 return;
             }
-            console.log('Подключено к базе данных MySQL');
 
-            // SQL-запрос для получения товаров по артисту
-            const selectQuery = 'SELECT * FROM products WHERE artist = ?';
-
-            // Выполнение SQL-запроса для получения товаров
-            connection.query(selectQuery, [artist], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении товаров:', error);
-                    connection.end();
-                    reject(error);
-                    return;
-                }
-
-                // Возвращаем результаты
-                resolve(results);
-
-                connection.end();
-            });
+            // Возвращаем результаты
+            resolve(results);
         });
     });
 }
 
 export function get_products_by_genre(genre) {
     return new Promise((resolve, reject) => {
-        connection.connect((error) => {
+        // SQL-запрос для получения товаров по жанру
+        const selectQuery = 'SELECT * FROM products WHERE genre = ?';
+
+        // Выполнение SQL-запроса для получения товаров
+        connection.query(selectQuery, [genre], (error, results) => {
             if (error) {
-                console.error('Ошибка подключения к базе данных:', error);
+                console.error('Ошибка при получении товаров:', error);
                 reject(error);
                 return;
             }
-            console.log('Подключено к базе данных MySQL');
 
-            // SQL-запрос для получения товаров по жанру
-            const selectQuery = 'SELECT * FROM products WHERE genre = ?';
-
-            // Выполнение SQL-запроса для получения товаров
-            connection.query(selectQuery, [genre], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении товаров:', error);
-                    connection.end();
-                    reject(error);
-                    return;
-                }
-
-                // Возвращаем результаты
-                resolve(results);
-
-                connection.end();
-            });
+            // Возвращаем результаты
+            resolve(results);
         });
     });
 }
