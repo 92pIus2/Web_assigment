@@ -1,4 +1,4 @@
-import {add_user} from "./database/users.js";
+import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
 import express from "express";
 import path from "path"
 import bodyParser from "body-parser";
@@ -13,7 +13,7 @@ app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname, '')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, './first version of view.html'));
+    res.sendFile(path.join(__dirname, './authorization_form.html'));
 });
 
 // API endpoint to retrieve items
@@ -24,6 +24,10 @@ app.get('/api/content', function (req, res) {
     }).catch((error) => {
         console.error(error); // Handle any errors
     });
+});
+
+app.get('/registration', (req, res) => {
+    res.sendFile('./index.html');
 });
 
 app.get('/content', (req, res) => {
@@ -39,6 +43,27 @@ app.post('/registration', (req, res) => {
 
     res.send('Registration successful!');
 });
+
+app.post('/login', (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    get_user_by_username(username).then((user) => {
+        console.log(user); // Log the retrieved user by username
+        if (user != null) {
+            checkPassword(username, password).then((status) => {
+                console.log(status);
+                res.send("Login successful");
+            }).catch((error) => {
+                console.log(error);
+            });
+        } else {
+            res.send(`No ${username} registered`);
+        }
+    }).catch((error) => {
+        console.error(error); // Handle any errors
+    });
+})
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
