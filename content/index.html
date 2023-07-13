@@ -7,16 +7,34 @@
             background-image: url("../fon.png");
             font-family: Arial, sans-serif;
             font-size: xx-large;
-            background-color: #f7f7f7;
-            margin: 0;
-            padding: 0;
+            background-color: #e9dfb1;
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
         }
 
         .container {
-            max-width: 90%;
-            margin: 0 auto;
             padding: 10px;
+            max-width: 900px;
+            margin-top: 20px;
             resize: both;
+        }
+
+        button {
+            width: 10%;
+            padding: 10px;
+            margin-top: 15px;
+            margin-left: 80%;
+            background-color: #492c21;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        button:hover {
+            background-color: #45a049;
         }
 
         h1 {
@@ -48,8 +66,11 @@
     </style>
 </head>
 <body>
+<a href="/">
+    <button><strong>Log in</strong></button>
+</a>
 <div class="container">
-    <h1>Online Store</h1>
+    <h1>Items: </h1>
 
     <table id="itemsTable">
         <tbody>
