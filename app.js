@@ -12,6 +12,7 @@ const app = express();
 app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname, '')));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, './authorization_form.html'));
 });
@@ -63,6 +64,11 @@ app.post('/login', (req, res) => {
     }).catch((error) => {
         console.error(error); // Handle any errors
     });
+})
+
+app.post('/add_to_cart', (req, res) => {
+    const itemId = req.body.id;
+    res.json({ message: `Added ${itemId} to cart` });
 })
 
 app.listen(3000, () => {

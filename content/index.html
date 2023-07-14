@@ -33,6 +33,19 @@
             border-radius: 3px;
         }
 
+        button[id="add"] {
+            width: 90%;
+            padding: 10px;
+            margin-top: 15px;
+            margin-left: 10%;
+            background-color: #492c21;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
         button:hover {
             background-color: #45a049;
         }
@@ -90,10 +103,7 @@
             }),
         })
             .then(response => response.json())
-            .then(data => {
-                // Handle the response data if needed
-                console.log(data);
-            })
+            .then(response => alert(response.message))
             .catch(error => console.log(error));
     }
 
@@ -112,7 +122,7 @@
             <p><img src="../template.png", alt="image"></p>
             <p>${item.genre}</p>
             <p>${item.price}</p>
-            <button onclick="addToCart('${item.id}')">Add to Cart</button>
+            <button id="add" onclick="addToCart('${item.id}')">Add to Cart</button>
           `;
                 row.appendChild(cell);
             }
