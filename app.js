@@ -1,8 +1,9 @@
 import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
 import express from "express";
+import session from "express-session"
 import path from "path"
 import bodyParser from "body-parser";
-import {fileURLToPath} from 'url';
+import {fileURLToPath} from "url";
 import {get_products_by_genre} from "./database/products.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +14,15 @@ app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname, '')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
+app.use(
+    session({
+        resave: false,
+        secret: '3f0B4Cb47bKd67nSFD5',
+        saveUninitialized: true,
+    })
+);
+
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, './authorization_form.html'));
 });
@@ -42,7 +52,8 @@ app.post('/registration', (req, res) => {
 
     add_user(email, username, password);
 
-    res.send('Registration successful!');
+    //res.send('Registration successful!');
+    res.redirect("/");
 });
 
 app.post('/login', (req, res) => {
