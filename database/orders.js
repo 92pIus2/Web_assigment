@@ -104,6 +104,263 @@ export function get_orders_by_user(email) {
         });
     });
 }
+
+export function get_products_in_cart(username) {
+    return new Promise((resolve, reject) => {
+        const selectQuery = `
+            SELECT order_items.*, products.*
+            FROM order_items
+            JOIN orders ON order_items.order_id = orders.id
+            JOIN products ON order_items.product_id = products.id
+            JOIN users ON orders.user_email = users.email
+            WHERE users.username = ? AND orders.status = 'in_cart'
+        `;
+
+        connection.query(selectQuery, [username], (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении элементов заказа в корзине:', error);
+                reject(error);
+                return;
+            }
+
+            resolve(results);
+        });
+    });
+}
+
+export function add_product_to_cart(username, product_id, count) {
+    return new Promise((resolve, reject) => {
+        // Get the user's email based on the username
+        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
+
+        connection.query(getUserEmailQuery, [username], (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении email пользователя:', error);
+                reject(error);
+                return;
+            }
+
+            if (results.length === 0) {
+                console.error('Пользователь не найден');
+                reject('Пользователь не найден');
+                return;
+            }
+
+            const user_email = results[0].email;
+
+            // Check if there is an open cart for the user
+            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
+
+            connection.query(getOpenCartQuery, [user_email], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при проверке открытой корзины:', error);
+                    reject(error);
+                    return;
+                }
+
+                let order_id;
+
+                if (results.length === 0) {
+                    // If no open cart exists, create a new cart for the user
+                    const createCartQuery = 'INSERT INTO orders (status, user_email) VALUES ("in_cart", ?)';
+
+                    connection.query(createCartQuery, [user_email], (error, results) => {
+                        if (error) {
+                            console.error('Ошибка при создании новой корзины:', error);
+                            reject(error);
+                            return;
+                        }
+
+                        order_id = results.insertId;
+                        addOrderItem(order_id, product_id, count);
+                    });
+                } else {
+                    // Use the existing open cart for the user
+                    order_id = results[0].id;
+                    addOrderItem(order_id, product_id, count);
+                }
+
+                resolve('Товар успешно добавлен в корзину');
+            });
+        });
+    });
+}
+
+function addOrderItem(order_id, product_id, count) {
+    const insertQuery = 'INSERT INTO order_items (order_id, product_id, count) VALUES (?, ?, ?)';
+
+    connection.query(insertQuery, [order_id, product_id, count], (error) => {
+        if (error) {
+            console.error('Ошибка при добавлении элемента заказа:', error);
+        }
+    });
+}
+
+export function remove_product_from_cart(username, product_id) {
+    return new Promise((resolve, reject) => {
+        // Get the user's email based on the username
+        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
+
+        connection.query(getUserEmailQuery, [username], (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении email пользователя:', error);
+                reject(error);
+                return;
+            }
+
+            if (results.length === 0) {
+                console.error('Пользователь не найден');
+                reject('Пользователь не найден');
+                return;
+            }
+
+            const user_email = results[0].email;
+
+            // Get the open cart for the user
+            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
+
+            connection.query(getOpenCartQuery, [user_email], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении открытой корзины:', error);
+                    reject(error);
+                    return;
+                }
+
+                if (results.length === 0) {
+                    console.error('Открытая корзина не найдена');
+                    reject('Открытая корзина не найдена');
+                    return;
+                }
+
+                const order_id = results[0].id;
+                removeOrderItem(order_id, product_id);
+
+                resolve('Товар успешно удален из корзины');
+            });
+        });
+    });
+}
+
+function removeOrderItem(order_id, product_id) {
+    const deleteQuery = 'DELETE FROM order_items WHERE order_id = ? AND product_id = ?';
+
+    connection.query(deleteQuery, [order_id, product_id], (error) => {
+        if (error) {
+            console.error('Ошибка при удалении элемента заказа:', error);
+        }
+    });
+}
+
+export function update_product_count_in_cart(username, product_id, new_count) {
+    return new Promise((resolve, reject) => {
+        // Get the user's email based on the username
+        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
+
+        connection.query(getUserEmailQuery, [username], (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении email пользователя:', error);
+                reject(error);
+                return;
+            }
+
+            if (results.length === 0) {
+                console.error('Пользователь не найден');
+                reject('Пользователь не найден');
+                return;
+            }
+
+            const user_email = results[0].email;
+
+            // Get the open cart for the user
+            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
+
+            connection.query(getOpenCartQuery, [user_email], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении открытой корзины:', error);
+                    reject(error);
+                    return;
+                }
+
+                if (results.length === 0) {
+                    console.error('Открытая корзина не найдена');
+                    reject('Открытая корзина не найдена');
+                    return;
+                }
+
+                const order_id = results[0].id;
+                updateOrderItemQuantity(order_id, product_id, new_count);
+
+                resolve('Количество товара в корзине успешно обновлено');
+            });
+        });
+    });
+}
+
+function updateOrderItemCount(order_id, product_id, new_count) {
+    const updateQuery = 'UPDATE order_items SET count = ? WHERE order_id = ? AND product_id = ?';
+
+    connection.query(updateQuery, [new_count, order_id, product_id], (error) => {
+        if (error) {
+            console.error('Ошибка при обновлении количества товара в корзине:', error);
+        }
+    });
+}
+
+export function update_cart_status_to_in_progress(username) {
+    return new Promise((resolve, reject) => {
+        // Get the user's email based on the username
+        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
+
+        connection.query(getUserEmailQuery, [username], (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении email пользователя:', error);
+                reject(error);
+                return;
+            }
+
+            if (results.length === 0) {
+                console.error('Пользователь не найден');
+                reject('Пользователь не найден');
+                return;
+            }
+
+            const user_email = results[0].email;
+
+            // Get the open cart for the user
+            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
+
+            connection.query(getOpenCartQuery, [user_email], (error, results) => {
+                if (error) {
+                    console.error('Ошибка при получении открытой корзины:', error);
+                    reject(error);
+                    return;
+                }
+
+                if (results.length === 0) {
+                    console.error('Открытая корзина не найдена');
+                    reject('Открытая корзина не найдена');
+                    return;
+                }
+
+                const order_id = results[0].id;
+                updateOrderStatus(order_id, 'in_progress');
+
+                resolve('Статус заказа успешно изменен на "в обработке"');
+            });
+        });
+    });
+}
+
+function updateOrderStatus(order_id, new_status) {
+    const updateQuery = 'UPDATE orders SET status = ? WHERE id = ?';
+
+    connection.query(updateQuery, [new_status, order_id], (error) => {
+        if (error) {
+            console.error('Ошибка при обновлении статуса заказа:', error);
+        }
+    });
+}
+
 /*
 get_order_by_id(1).then((order) => {
     console.log(order); // Log the retrieved order by ID
@@ -116,3 +373,8 @@ get_orders_by_user('test@test.test').then((orders) => {
 }).catch((error) => {
     console.error(error); // Handle any errors
 }); */
+/*get_products_in_cart('test').then((results) => {
+    console.log(results); // Log the retrieved orders in cart and associated products by username
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});*/
