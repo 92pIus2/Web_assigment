@@ -56,12 +56,16 @@
         }
 
         table {
-            border-collapse: collapse;
+            overflow-y: scroll;
+            overflow-x: auto;
+            border-collapse: separate;
+            border-spacing: 10px;
             margin-top: 20px;
             table-layout: auto;
         }
 
         th, td {
+            background: rgba(169, 169, 169, 0.3);
             padding: 12px 8px;
             text-align: center;
             border-bottom: none;
@@ -110,16 +114,16 @@
     function addItems(items) {
         const tableBody = document.querySelector('#itemsTable tbody');
 
-        for (let i = 0; i < items.length; i += 2) {
+        for (let i = 0; i < items.length; i += 3) {
             const row = document.createElement('tr');
 
-            for (let j = i; j < i + 2 && j < items.length; j++) {
+            for (let j = i; j < i + 3 && j < items.length; j++) {
                 const item = items[j];
                 const cell = document.createElement('td');
                 cell.innerHTML = `
             <p><strong>${item.album}</strong></p>
             <p><strong>${item.artist}</strong></p>
-            <p><img src="../template.png", alt="image"></p>
+            <p><img src="../hernya.jpg", alt="image"></p>
             <p>${item.genre}</p>
             <p>${item.price}</p>
             <button id="add" onclick="addToCart('${item.id}')">Add to Cart</button>

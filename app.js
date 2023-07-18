@@ -29,12 +29,57 @@ app.get('/', function (req, res) {
 
 // API endpoint to retrieve items
 app.get('/api/content', function (req, res) {
-    get_products_by_genre('Hip-Hop').then((products) => {
+    const pr = [
+        {
+            id: 1,
+            artist: "ПОСТная Херня",
+            album: "Пойдём в МакДак",
+            genre: "Post-punk",
+            price: "10"
+        },
+        {
+            id: 2,
+            artist: "ПОСТная Херня",
+            album: "Пойдём в МакДак",
+            genre: "Post-punk",
+            price: "10"
+        },
+        {
+            id: 3,
+            artist: "ПОСТная Херня",
+            album: "Пойдём в МакДак",
+            genre: "Post-punk",
+            price: "10"
+        },
+        {
+            id: 4,
+            artist: "ПОСТная Херня",
+            album: "Пойдём в МакДак",
+            genre: "Post-punk",
+            price: "10"
+        },
+        {
+            id: 5,
+            artist: "ПОСТная Херня",
+            album: "Пойдём в МакДак",
+            genre: "Post-punk",
+            price: "10"
+        },
+        {
+            id: 6,
+            artist: "ПОСТная Херня",
+            album: "Пойдём в МакДак",
+            genre: "Post-punk",
+            price: "10"
+        }
+    ];
+    /*get_products_by_genre('Hip-Hop').then((products) => {
         console.log(products); // Log the retrieved products by genre
         res.json(products);
     }).catch((error) => {
         console.error(error); // Handle any errors
-    });
+    });*/
+    res.json(pr);
 });
 
 app.get('/registration', (req, res) => {
@@ -65,7 +110,11 @@ app.post('/login', (req, res) => {
         if (user != null) {
             checkPassword(username, password).then((status) => {
                 console.log(status);
-                res.send("Login successful");
+                if (status) {
+                    res.send("Login successful");
+                } else {
+                    alert("Wrong password, try again!");
+                }
             }).catch((error) => {
                 console.log(error);
             });
@@ -79,7 +128,7 @@ app.post('/login', (req, res) => {
 
 app.post('/add_to_cart', (req, res) => {
     const itemId = req.body.id;
-    res.json({ message: `Added ${itemId} to cart` });
+    res.json({message: `Added ${itemId} to cart`});
 })
 
 app.listen(3000, () => {
