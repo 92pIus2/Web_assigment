@@ -86,15 +86,21 @@
         for (let i = 0; i < items.length; i++) {
             const cell = document.createElement('div');
             const item = items[i];
-            cell.className = 'bg-body-secondary bg-opacity-75 col-xxl-3 col-xl-3 col-lg-3, col-md-4 ' +
-                'col-sm-12 col-xs-12 m-3 rounded-3 border border-3';
+            cell.className = 'col-xxl-3 col-xl-3 col-lg-3, col-md-4 ' +
+                'col-sm-12 col-xs-12 m-3';
             cell.innerHTML = `
-            <p class="text-center"><strong>${item.album}</strong></p>
-            <p class="text-center"><strong>${item.artist}</strong></p>
-            <p class="text-center"><img src="../hernya.jpg", alt="image"></p>
-            <p class="text-center">${item.genre}</p>
-            <p class="text-center">${item.price}</p>
-            <button type="button" class="btn btn-success float-end" id="add" onclick="addToCart('${item.id}')">Add to Cart</button>
+            <div class="card text-center">
+            <img class="card-img-top p-3" src="../hernya.jpg" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title"><strong>${item.album}</strong></h5>
+                <p class="card-text"><strong>${item.artist}</strong></p>
+                <p class="card-text">${item.genre}</p>
+                <p class="card-text">${item.price}</p>
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-success float-end" id="add" onclick="addToCart('${item.id}')">Add to Cart</button>
+            </div>
+            </div>
           `;
             body.appendChild(cell);
         }
