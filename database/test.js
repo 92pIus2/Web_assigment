@@ -6,7 +6,7 @@ const connection = mysql.createConnection({
   password: 'twVQVPvpFA',
   database: 'sql7634155'
 });
-function print_users() {
+export function print_users() {
   connection.connect((error) => {
     if (error) {
       console.error('Ошибка подключения к базе данных:', error);
@@ -35,7 +35,7 @@ function print_users() {
   });
 }
 
-function print_products() {
+export function print_products() {
   connection.connect((error) => {
     if (error) {
       console.error('Ошибка подключения к базе данных:', error);
@@ -120,8 +120,6 @@ function print_order_items() {
 
   });
 }
-
-print_order_items()
 
 /*connection.connect((error) => {
   if (error) {
