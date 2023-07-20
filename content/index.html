@@ -17,6 +17,17 @@
             background-repeat: no-repeat;
         }
 
+        .btn-primary {
+            background-color: #492c21;
+            border-color: #492c21;
+            color: #FFF;
+        }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background-color: #573d38;
+            border-color: #573d38;
+            color: #FFF;
+        }
+
         .container {
             padding: 10px;
             margin-top: 20px;
@@ -57,6 +68,9 @@
 <body>
 <a href="/">
     <button type="button" class="btn btn-success btn-lg float-end me-5"><strong>Log in</strong></button>
+</a>
+<a href="/cart">
+    <button type="button" class="btn btn-primary btn-lg float-end me-2"><strong>My cart</strong></button>
 </a>
 <div class="container m-3">
     <h1>Items: </h1>
