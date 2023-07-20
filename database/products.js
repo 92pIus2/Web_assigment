@@ -4,9 +4,9 @@ import {delete_order} from "./orders.js";
 
 const connection = mysql.createConnection({
     host: 'sql7.freesqldatabase.com',
-    user: 'sql7632054',
-    password: 'QibQTRHnma',
-    database: 'sql7632054'
+    user: 'sql7634155',
+    password: 'twVQVPvpFA',
+    database: 'sql7634155'
 });
 
 connection.connect((error) => {
@@ -16,7 +16,11 @@ connection.connect((error) => {
     }
     console.log('Подключено к базе данных MySQL');
 });
-
+//id
+//artist
+//album
+//price
+//genre
 export function add_product(id, artist, album, price, genre){
     // SQL-запрос для вставки данных
     const insertQuery = `

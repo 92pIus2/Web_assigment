@@ -3,9 +3,9 @@ import mysql from 'mysql'
 
 const connection = mysql.createConnection({
     host: 'sql7.freesqldatabase.com',
-    user: 'sql7632054',
-    password: 'QibQTRHnma',
-    database: 'sql7632054'
+    user: 'sql7634155',
+    password: 'twVQVPvpFA',
+    database: 'sql7634155'
 });
 
 connection.connect((error) => {
