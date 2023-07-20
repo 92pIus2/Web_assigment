@@ -30,7 +30,7 @@
                     <!-- Cart items will be dynamically added here -->
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Total: €0.00</h5>
+                    <h5 class="card-title" id="price">Total: €0.00</h5>
                     <button class="btn btn-success">Checkout</button>
                 </div>
             </div>
@@ -40,6 +40,7 @@
 <script>
     function fullCart(items) {
         const body = document.querySelector('#cart');
+        let total_price = 0;
 
         for (let i = 0; i < items.length; i++) {
             const cell = document.createElement('div');
@@ -60,7 +61,11 @@
             </div>
           `;
             body.appendChild(cell);
+            total_price += item.price;
         }
+
+        const price = document.querySelector('#price');
+        price.innerHTML = `Total: €${total_price}`
     }
 
     fetch('/api/cart')
