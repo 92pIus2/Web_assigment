@@ -1,12 +1,12 @@
-import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
+import {add_user, checkPassword, get_user_by_username} from "../database/users.js";
 import express from "express";
 import session from "express-session"
 import path from "path"
 import bodyParser from "body-parser";
 import {fileURLToPath} from "url";
-import {add_product, get_products_by_genre} from "./database/products.js";
-import {add_product_to_cart, get_products_in_cart} from "./database/orders.js";
-import {print_users, print_products} from "./database/test.js"
+import {add_product, get_products_by_genre} from "../database/products.js";
+import {add_product_to_cart, get_products_in_cart} from "../database/orders.js";
+import {print_users, print_products} from "../database/test.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,8 +25,8 @@ index.use(
     })
 );
 
-index.get('/', function (req, res) {
-    res.sendFile('./index.html');
+index.get('/api', function (req, res) {
+    res.sendFile('../index.html');
 });
 
 // API endpoint to retrieve items
