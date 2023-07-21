@@ -1,4 +1,4 @@
-import { json, send } from 'micro';
+
 import { parse } from 'url';
 import path from 'path';
 import fs from 'fs';
