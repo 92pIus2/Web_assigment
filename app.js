@@ -26,7 +26,7 @@ app.use(
 );
 
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, './authorization_form.html'));
+    res.sendFile('./index.html');
 });
 
 // API endpoint to retrieve items
