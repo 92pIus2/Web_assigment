@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=“viewport” content=“width=device-width, initial-scale=1, shrink-to-fit=no”>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <title>Cart</title>
+    <style>
+        body {
+            background-image: url("../fon.png");
+            font-family: Arial, sans-serif;
+            font-size: xx-large;
+            background-color: #e9dfb1;
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+<div class="container m-3 mb-5">
+    <div class="row m-3">
+        <div class="col-11">
+            <div class="card">
+                <div class="card-header">
+                    Shopping Cart
+                </div>
+                <div class="row m-3" id="cart">
+                    <!-- Cart items will be dynamically added here -->
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" id="price">Total: €0.00</h5>
+                    <button class="btn btn-success">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function fullCart(items) {
+        const body = document.querySelector('#cart');
+        let total_price = 0;
+
+        for (let i = 0; i < items.length; i++) {
+            const cell = document.createElement('div');
+            const item = items[i];
+            cell.className = 'col-xxl-5 col-xl-5 col-lg-5, col-md-5 ' +
+                'col-sm-12 col-xs-12 m-3';
+            cell.innerHTML = `
+            <div class="card text-center">
+            <img class="card-img-top p-3" src="../hernya.jpg" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title"><strong>${item.album}</strong></h5>
+                <p class="card-text"><strong>${item.artist}</strong></p>
+                <p class="card-text">${item.price}</p>
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-danger float-end"">Delete</button>
+            </div>
+            </div>
+          `;
+            body.appendChild(cell);
+            total_price += item.price;
+        }
+
+        const price = document.querySelector('#price');
+        price.innerHTML = `Total: €${total_price}`
+    }
+
+    fetch('/api/cart')
+        .then(response => response.json())
+        .then(data => {
+            fullCart(data);
+        })
+        .catch(error => console.log(error));
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+</body>
+</html>
