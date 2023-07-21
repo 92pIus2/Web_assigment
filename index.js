@@ -10,14 +10,14 @@ import {print_users, print_products} from "./database/test.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const app = express();
+const index = express();
 
-app.set('view engine', 'html');
-app.use(express.static(path.join(__dirname, '')));
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+index.set('view engine', 'html');
+index.use(express.static(path.join(__dirname, '')));
+index.use(bodyParser.urlencoded({extended: true}));
+index.use(bodyParser.json());
 
-app.use(
+index.use(
     session({
         resave: false,
         secret: '3f0B4Cb47bKd67nSFD5',
@@ -25,13 +25,13 @@ app.use(
     })
 );
 
-app.get('/', function (req, res) {
+index.get('/', function (req, res) {
     res.sendFile('./index.html');
 });
 
 // API endpoint to retrieve items
 
-app.get('/api/cart', (req, res) => {
+index.get('/api/cart', (req, res) => {
     get_products_in_cart(req.session.username).then((products) => {
         console.log(products); // Log the retrieved products by genre
         res.json(products);
@@ -40,7 +40,7 @@ app.get('/api/cart', (req, res) => {
     });
 });
 
-app.get('/api/content', function (req, res) {
+index.get('/api/content', function (req, res) {
     res.json([{
         id: 5,
         album: "Hernya",
@@ -55,15 +55,15 @@ app.get('/api/content', function (req, res) {
     });*/
 });
 
-app.get('/registration', (req, res) => {
+index.get('/registration', (req, res) => {
     res.sendFile('./index.html');
 });
 
-app.get('/content', (req, res) => {
+index.get('/content', (req, res) => {
     res.sendFile('./index.html');
 });
 
-app.post('/registration', (req, res) => {
+index.post('/registration', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     const email = req.body.email;
@@ -74,7 +74,7 @@ app.post('/registration', (req, res) => {
     res.redirect("/");
 });
 
-app.post('/login', (req, res) => {
+index.post('/login', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -101,7 +101,7 @@ app.post('/login', (req, res) => {
     });
 })
 
-app.post('/add_to_cart', (req, res) => {
+index.post('/add_to_cart', (req, res) => {
     const itemId = req.body.id;
     add_product_to_cart(req.session.username, itemId, 1).then((ans) => {
         console.log(ans);
@@ -112,6 +112,6 @@ app.post('/add_to_cart', (req, res) => {
     });
 })
 
-app.listen(3000, () => {
+index.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
