@@ -1,21 +1,26 @@
-import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
-import express from "express";
-import session from "express-session"
-import path from "path"
-import bodyParser from "body-parser";
-import {fileURLToPath} from "url";
-import {add_product, get_products_by_genre} from "./database/products.js";
-import {add_product_to_cart, get_products_in_cart} from "./database/orders.js";
-import {print_users, print_products} from "./database/test.js"
+import { json, send } from 'micro';
+import { parse } from 'url';
+import path from 'path';
+import fs from 'fs';
+import express from 'express'; // Import express as default
 
-const __filename = fileURLToPath(import.meta.url);
+import { add_user, checkPassword, get_user_by_username } from './database/users.js';
+import { add_product_to_cart, get_products_in_cart } from './database/orders.js'; // Corrected import
+import { add_product, get_products_by_genre } from './database/products.js';
+import { print_users, print_products } from './database/test.js';
+import session from 'express-session';
+
+const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
+
 const app = express();
 
 app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname, '')));
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+
+// Add the express.json() and express.urlencoded() middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
     session({
@@ -25,87 +30,99 @@ app.use(
     })
 );
 
-app.get('/', function (req, res) {
-    res.sendFile('./index.html');
+app.get('/', (req, res) => {
+    const filePath = path.join(__dirname, 'index.html');
+    const loginPage = fs.readFileSync(filePath, 'utf8');
+    return res.send(loginPage);
 });
 
 // API endpoint to retrieve items
 
-app.get('/api/cart', (req, res) => {
-    get_products_in_cart(req.session.username).then((products) => {
-        console.log(products); // Log the retrieved products by genre
-        res.json(products);
-    }).catch((error) => {
-        console.error(error); // Handle any errors
-    });
+app.get('/api/cart', async (req, res) => {
+    try {
+        const products = await get_products_in_cart(req.session.username);
+        console.log(products);
+        return res.json(products);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
-app.get('/api/content', function (req, res) {
-    get_products_by_genre('Hip-Hop').then((products) => {
-        console.log(products); // Log the retrieved products by genre
-        res.json(products);
-    }).catch((error) => {
-        console.error(error); // Handle any errors
-    });
+app.get('/api/content', async (req, res) => {
+    try {
+        const products = await get_products_by_genre('Hip-Hop');
+        console.log(products);
+        return res.json(products);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 app.get('/registration', (req, res) => {
-    res.sendFile('./index.html');
+    const filePath = path.join(__dirname, 'index.html');
+    const registrationPage = fs.readFileSync(filePath, 'utf8');
+    return res.send(registrationPage);
 });
 
 app.get('/content', (req, res) => {
-    res.sendFile('./index.html');
+    const filePath = path.join(__dirname, 'index.html');
+    const contentPage = fs.readFileSync(filePath, 'utf8');
+    return res.send(contentPage);
 });
 
-app.post('/registration', (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    const email = req.body.email;
+app.post('/registration', async (req, res) => {
+    const { username, password, email } = req.body;
 
     add_user(email, username, password);
 
-    //res.send('Registration successful!');
-    res.redirect("/");
+    return res.redirect("/");
 });
 
-app.post('/login', (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
 
-    get_user_by_username(username).then((user) => {
-        console.log(user); // Log the retrieved user by username
+    try {
+        const user = await get_user_by_username(username);
+
         if (user != null) {
-            checkPassword(username, password).then((status) => {
-                console.log(status);
-                if (status) {
-                    req.session.loggedin = true;
-                    req.session.username = username;
-                    res.redirect('/content');
-                } else {
-                    alert("Wrong password, try again!");
-                }
-            }).catch((error) => {
-                console.log(error);
-            });
+            const status = await checkPassword(username, password);
+
+            if (status) {
+                req.session.loggedin = true;
+                req.session.username = username;
+                return res.redirect('/content');
+            } else {
+                return res.status(400).send('Wrong password, try again!');
+            }
         } else {
-            res.send(`No ${username} registered`);
+            return res.status(404).send(`No ${username} registered`);
         }
-    }).catch((error) => {
-        console.error(error); // Handle any errors
-    });
-})
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
-app.post('/add_to_cart', (req, res) => {
-    const itemId = req.body.id;
-    add_product_to_cart(req.session.username, itemId, 1).then((ans) => {
+app.post('/add_to_cart', async (req, res) => {
+    const { id: itemId } = req.body;
+
+    try {
+        const ans = await add_product_to_cart(req.session.username, itemId, 1);
         console.log(ans);
-        res.json({message: `Added ${itemId} to cart`});
-    }).catch((error) => {
-       console.error(error);
-       res.json({message: `Error occurred`});
-    });
-})
+        return res.json({ message: `Added ${itemId} to cart` });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+// Wrap the express app with micro
+const handler = (req, res) => app(req, res);
+
+// Start the server
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -14,8 +14,10 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "bootstrap": "^5.3.0",
+    "cookie": "^0.5.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "micro": "^10.0.1",
     "mysql": "^2.18.1",
     "nodemon": "^3.0.1"
   }
