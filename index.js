@@ -41,18 +41,12 @@ index.get('/api/cart', (req, res) => {
 });
 
 index.get('/api/content', function (req, res) {
-    res.json([{
-        id: 5,
-        album: "Hernya",
-        genre: "Hyinya",
-        price: 239,
-    }]);
-    /*get_products_by_genre('Hip-Hop').then((products) => {
+    get_products_by_genre('Hip-Hop').then((products) => {
         console.log(products); // Log the retrieved products by genre
         res.json(products);
     }).catch((error) => {
         console.error(error); // Handle any errors
-    });*/
+    });
 });
 
 index.get('/registration', (req, res) => {
