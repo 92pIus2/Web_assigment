@@ -33,7 +33,7 @@ app.get('/', function (req, res) {
 
 app.get('/api/cart', (req, res) => {
     get_products_in_cart(req.session.username).then((products) => {
-        console.log(products); // Log the retrieved products by genre
+        console.log(products);
         res.json(products);
     }).catch((error) => {
         console.error(error); // Handle any errors
