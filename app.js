@@ -4,7 +4,7 @@ import session from "express-session"
 import path from "path"
 import bodyParser from "body-parser";
 import {fileURLToPath} from "url";
-import {add_product, get_products_by_genre} from "./database/products.js";
+import {add_product, get_all_products, get_products_by_genre} from "./database/products.js";
 import {add_product_to_cart, get_products_in_cart} from "./database/orders.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,7 +41,7 @@ app.get('/api/cart', (req, res) => {
 
 app.get('/api/items', (req, res) => {
     console.log("dfdfdrgr");
-    get_products_by_genre('Hip-Hop').then((products) => {
+    get_all_products().then((products) => {
         console.log(products); // Log the retrieved products by genre
         res.json(products);
     }).catch((error) => {

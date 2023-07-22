@@ -1,6 +1,4 @@
-import mysql from 'mysql'
-import {delete_order} from "./orders.js";
-
+import mysql from 'mysql';
 
 const connection = mysql.createConnection({
     host: 'sql7.freesqldatabase.com',
@@ -16,17 +14,19 @@ connection.connect((error) => {
     }
     console.log('Подключено к базе данных MySQL');
 });
-//id
-//artist
-//album
-//price
-//genre
-export function add_product(id, artist, album, price, genre){
+
+// id
+// artist
+// album
+// price
+// genre
+
+export function add_product(id, artist, album, price, genre) {
     // SQL-запрос для вставки данных
     const insertQuery = `
-  INSERT INTO products (id, artist, album, price, genre)
-  VALUES (?, ?, ?, ?, ?)
-`;
+        INSERT INTO products (id, artist, album, price, genre)
+        VALUES (?, ?, ?, ?, ?)
+    `;
     const values = [id, artist, album, price, genre];
 
     // Выполнение SQL-запроса для вставки данных
@@ -40,8 +40,7 @@ export function add_product(id, artist, album, price, genre){
 }
 
 export function update_product(id, new_artist, new_album, new_price, new_genre) {
-
-// Выполняем SQL-запрос для обновления данных
+    // Выполняем SQL-запрос для обновления данных
     const updateQuery = 'UPDATE products SET artist = ?, album = ?, price = ?, genre = ? WHERE id = ?';
 
     connection.query(updateQuery, [new_artist, new_album, new_price, new_genre, id], (error, results) => {
@@ -125,22 +124,22 @@ export function get_products_by_genre(genre) {
         });
     });
 }
-/*
-get_product_by_id(1).then((product) => {
-    console.log(product); // Log the retrieved product by ID
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
 
-get_products_by_artist('Tyler, the Creator').then((products) => {
-    console.log(products); // Log the retrieved products by artist
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
+export function get_all_products() {
+    return new Promise((resolve, reject) => {
+        // SQL-запрос для получения всех товаров
+        const selectQuery = 'SELECT * FROM products';
 
-get_products_by_genre('Hip-Hop').then((products) => {
-    console.log(products); // Log the retrieved products by genre
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
-*/
+        // Выполнение SQL-запроса для получения всех товаров
+        connection.query(selectQuery, (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении всех товаров:', error);
+                reject(error);
+                return;
+            }
+
+            // Возвращаем результаты
+            resolve(results);
+        });
+    });
+}

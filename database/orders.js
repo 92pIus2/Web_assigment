@@ -162,34 +162,70 @@ export function add_product_to_cart(username, product_id, count) {
 
                 if (results.length === 0) {
                     // If no open cart exists, create a new cart for the user
-                    const createCartQuery = 'INSERT INTO orders (status, user_email) VALUES ("in_cart", ?)';
-
-                    connection.query(createCartQuery, [user_email], (error, results) => {
+                    const getLastOrderIdQuery = 'SELECT MAX(id) AS last_id FROM orders';
+                    connection.query(getLastOrderIdQuery, (error, results) => {
                         if (error) {
-                            console.error('Ошибка при создании новой корзины:', error);
+                            console.error('Ошибка при получении последнего ID заказа:', error);
                             reject(error);
                             return;
                         }
 
-                        order_id = results.insertId;
-                        addOrderItem(order_id, product_id, count);
+                        order_id = results[0].last_id + 1;
+
+                        // Check the last id in order_items table as well
+                        const getLastOrderItemIdQuery = 'SELECT MAX(id) AS last_order_item_id FROM order_items';
+                        connection.query(getLastOrderItemIdQuery, (error, results) => {
+                            if (error) {
+                                console.error('Ошибка при получении последнего ID элемента заказа:', error);
+                                reject(error);
+                                return;
+                            }
+
+                            const order_item_id = results[0].last_order_item_id + 1;
+
+                            const createCartQuery = 'INSERT INTO orders (id, status, user_email) VALUES (?, "in_cart", ?)';
+                            connection.query(createCartQuery, [order_id, user_email], (error) => {
+                                if (error) {
+                                    console.error('Ошибка при создании новой корзины:', error);
+                                    reject(error);
+                                    return;
+                                }
+
+                                addOrderItem(order_item_id, order_id, product_id, count);
+                                resolve('Товар успешно добавлен в корзину');
+                            });
+                        });
                     });
                 } else {
                     // Use the existing open cart for the user
                     order_id = results[0].id;
-                    addOrderItem(order_id, product_id, count);
-                }
 
-                resolve('Товар успешно добавлен в корзину');
+                    // Check the last id in order_items table as well
+                    const getLastOrderItemIdQuery = 'SELECT MAX(id) AS last_order_item_id FROM order_items';
+                    connection.query(getLastOrderItemIdQuery, (error, results) => {
+                        if (error) {
+                            console.error('Ошибка при получении последнего ID элемента заказа:', error);
+                            reject(error);
+                            return;
+                        }
+
+                        const order_item_id = results[0].last_order_item_id + 1;
+                        addOrderItem(order_item_id, order_id, product_id, count);
+                        resolve('Товар успешно добавлен в корзину');
+                    });
+                }
             });
         });
     });
 }
 
-function addOrderItem(order_id, product_id, count) {
-    const insertQuery = 'INSERT INTO order_items (order_id, product_id, count) VALUES (?, ?, ?)';
 
-    connection.query(insertQuery, [order_id, product_id, count], (error) => {
+
+
+function addOrderItem(id, order_id, product_id, count) {
+    const insertQuery = 'INSERT INTO order_items (id, order_id, product_id, count) VALUES (?, ?, ?, ?)';
+
+    connection.query(insertQuery, [id, order_id, product_id, count], (error) => {
         if (error) {
             console.error('Ошибка при добавлении элемента заказа:', error);
         }
