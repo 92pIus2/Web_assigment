@@ -120,7 +120,6 @@ function print_order_items() {
 
   });
 }
-print_users()
 /*connection.connect((error) => {
   if (error) {
     console.error('Ошибка подключения к базе данных:', error);

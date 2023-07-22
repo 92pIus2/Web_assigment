@@ -122,7 +122,7 @@
     }
 
     // Fetch data from the server API
-    fetch('/api/content')
+    fetch('/api/items')
         .then(response => response.json())
         .then(data => {
             addItems(data);

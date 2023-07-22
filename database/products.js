@@ -1,24 +1,36 @@
-import pkg from 'pg';
-const { Pool } = pkg;
-
-const pool = new Pool({
-
-    connectionString: "postgres://default:NuFfPp95MOcw@ep-fancy-art-548814-pooler.us-east-1.postgres.vercel-storage.com:5432/verceldb?sslmode=require",
-
-})
-
-// Rest of your code using the 'pool' to interact with the PostgreSQL database
+import mysql from 'mysql'
+import {delete_order} from "./orders.js";
 
 
+const connection = mysql.createConnection({
+    host: 'sql7.freesqldatabase.com',
+    user: 'sql7634155',
+    password: 'twVQVPvpFA',
+    database: 'sql7634155'
+});
 
-export function add_product(id, artist, album, price, genre) {
+connection.connect((error) => {
+    if (error) {
+        console.error('Ошибка подключения к базе данных:', error);
+        return;
+    }
+    console.log('Подключено к базе данных MySQL');
+});
+//id
+//artist
+//album
+//price
+//genre
+export function add_product(id, artist, album, price, genre){
+    // SQL-запрос для вставки данных
     const insertQuery = `
-        INSERT INTO products (id, artist, album, price, genre)
-        VALUES ($1, $2, $3, $4, $5)
-    `;
+  INSERT INTO products (id, artist, album, price, genre)
+  VALUES (?, ?, ?, ?, ?)
+`;
     const values = [id, artist, album, price, genre];
 
-    pool.query(insertQuery, values, (error) => {
+    // Выполнение SQL-запроса для вставки данных
+    connection.query(insertQuery, values, (error) => {
         if (error) {
             console.error('Ошибка вставки данных:', error);
             return;
@@ -28,27 +40,27 @@ export function add_product(id, artist, album, price, genre) {
 }
 
 export function update_product(id, new_artist, new_album, new_price, new_genre) {
-    const updateQuery = `
-        UPDATE products 
-        SET artist = $1, album = $2, price = $3, genre = $4 
-        WHERE id = $5
-    `;
 
-    const values = [new_artist, new_album, new_price, new_genre, id];
+// Выполняем SQL-запрос для обновления данных
+    const updateQuery = 'UPDATE products SET artist = ?, album = ?, price = ?, genre = ? WHERE id = ?';
 
-    pool.query(updateQuery, values, (error, results) => {
+    connection.query(updateQuery, [new_artist, new_album, new_price, new_genre, id], (error, results) => {
         if (error) {
             console.error('Ошибка при обновлении данных:', error);
+            // Обработка ошибки
         } else {
             console.log('Данные успешно обновлены!');
+            // Дополнительные действия при успешном обновлении данных
         }
     });
 }
 
 export function delete_product(id) {
-    const deleteQuery = 'DELETE FROM products WHERE id = $1';
+    // SQL-запрос для удаления данных
+    const deleteQuery = 'DELETE FROM products WHERE id = ?';
 
-    pool.query(deleteQuery, [id], (error, results) => {
+    // Выполнение SQL-запроса для удаления данных
+    connection.query(deleteQuery, [id], (error, results) => {
         if (error) {
             console.error('Ошибка при удалении товара:', error);
             return;
@@ -59,114 +71,76 @@ export function delete_product(id) {
 
 export function get_product_by_id(id) {
     return new Promise((resolve, reject) => {
-        const selectQuery = 'SELECT * FROM products WHERE id = $1';
+        // SQL-запрос для получения товара по ID
+        const selectQuery = 'SELECT * FROM products WHERE id = ?';
 
-        pool.query(selectQuery, [id], (error, results) => {
+        // Выполнение SQL-запроса для получения товара
+        connection.query(selectQuery, [id], (error, results) => {
             if (error) {
                 console.error('Ошибка при получении товара:', error);
                 reject(error);
                 return;
             }
 
-            resolve(results.rows[0]);
+            // Возвращаем результаты
+            resolve(results[0]);
         });
     });
 }
 
 export function get_products_by_artist(artist) {
     return new Promise((resolve, reject) => {
-        const selectQuery = 'SELECT * FROM products WHERE artist = $1';
+        // SQL-запрос для получения товаров по артисту
+        const selectQuery = 'SELECT * FROM products WHERE artist = ?';
 
-        pool.query(selectQuery, [artist], (error, results) => {
+        // Выполнение SQL-запроса для получения товаров
+        connection.query(selectQuery, [artist], (error, results) => {
             if (error) {
                 console.error('Ошибка при получении товаров:', error);
                 reject(error);
                 return;
             }
 
-            resolve(results.rows);
+            // Возвращаем результаты
+            resolve(results);
         });
     });
 }
 
 export function get_products_by_genre(genre) {
     return new Promise((resolve, reject) => {
-        const selectQuery = 'SELECT * FROM products WHERE genre = $1';
+        // SQL-запрос для получения товаров по жанру
+        const selectQuery = 'SELECT * FROM products WHERE genre = ?';
 
-        pool.query(selectQuery, [genre], (error, results) => {
+        // Выполнение SQL-запроса для получения товаров
+        connection.query(selectQuery, [genre], (error, results) => {
             if (error) {
                 console.error('Ошибка при получении товаров:', error);
                 reject(error);
                 return;
             }
 
-            resolve(results.rows);
+            // Возвращаем результаты
+            resolve(results);
         });
     });
 }
+/*
+get_product_by_id(1).then((product) => {
+    console.log(product); // Log the retrieved product by ID
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
 
-export function create_table() {
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS products (
-            id SERIAL PRIMARY KEY,
-            artist VARCHAR(255) NOT NULL,
-            album VARCHAR(255) NOT NULL,
-            price NUMERIC(10, 2) NOT NULL,
-            genre VARCHAR(100) NOT NULL
-        )
-    `;
+get_products_by_artist('Tyler, the Creator').then((products) => {
+    console.log(products); // Log the retrieved products by artist
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
 
-    const insertProductsQuery = `
-        INSERT INTO products (artist, album, price, genre)
-        VALUES
-            ('Artist 1', 'Album 1', 10, 'Hip-Hop'),
-            ('Artist 2', 'Album 2', 20, 'Hip-Hop')
-    `;
-
-    pool.query(createTableQuery, (error) => {
-        if (error) {
-            console.error('Ошибка при создании таблицы:', error);
-            return;
-        }
-
-        console.log('Таблица успешно создана');
-
-        pool.query(insertProductsQuery, (error) => {
-            if (error) {
-                console.error('Ошибка при добавлении продуктов:', error);
-                return;
-            }
-            console.log('Продукты успешно добавлены');
-        });
-    });
-}
-export function get_all_products() {
-    return new Promise((resolve, reject) => {
-        const selectQuery = 'SELECT * FROM products';
-
-        pool.query(selectQuery, (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении всех товаров:', error);
-                reject(error);
-                return;
-            }
-
-            resolve(results.rows);
-        });
-    });
-}
-async function main() {
-    try {
-        // Создаем таблицу и добавляем продукты (если они еще не созданы)
-
-        // Получаем продукты по жанру
-        const productsByGenre = await get_products_by_genre('Hip-Hop');
-        console.log('Продукты по жанру:', productsByGenre);
-
-
-    } catch (error) {
-        console.error('Произошла ошибка:', error);
-    }
-}
-
-
+get_products_by_genre('Hip-Hop').then((products) => {
+    console.log(products); // Log the retrieved products by genre
+}).catch((error) => {
+    console.error(error); // Handle any errors
+});
+*/

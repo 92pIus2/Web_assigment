@@ -39,7 +39,8 @@ app.get('/api/cart', (req, res) => {
     });
 });
 
-app.get('/api/content', function (req, res) {
+app.get('/api/items', (req, res) => {
+    console.log("dfdfdrgr");
     get_products_by_genre('Hip-Hop').then((products) => {
         console.log(products); // Log the retrieved products by genre
         res.json(products);
