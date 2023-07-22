@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 import {fileURLToPath} from "url";
 import {add_product, get_products_by_genre} from "./database/products.js";
 import {add_product_to_cart, get_products_in_cart} from "./database/orders.js";
-import {print_users, print_products} from "./database/test.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
