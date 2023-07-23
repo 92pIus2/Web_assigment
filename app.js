@@ -66,6 +66,10 @@ app.get('/content', (req, res) => {
     res.sendFile('./index.html');
 });
 
+app.get('/cart', (req, res) => {
+    res.sendFile('./index.html');
+});
+
 app.post('/registration', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -120,6 +124,7 @@ app.delete('/api/cart/:itemId', (req, res) => {
 
     // Call the delete_order_item function from order_items.js
     delete_order_item(itemId)
+    res.redirect("/cart")
 });
 
 app.post('/api/orders/update_cart_status_to_in_progress', (req, res) => {
@@ -141,6 +146,7 @@ app.patch('/api/cart/update_count/:orderItemId', (req, res) => {
     // Your logic to update the item count in the cart on the server
     // You can call the updateOrderItemCount function here passing the necessary data
     updateOrderItemCount(orderItemId, newQuantity);
+    res.redirect("/cart")
 
 });
 app.listen(process.env.PORT || 3000, () => {

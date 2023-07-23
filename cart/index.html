@@ -80,16 +80,14 @@
         fetch(`/api/cart/${id}`, {
             method: 'DELETE'
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
+            .then(_ => {
                 fetch('/api/cart')
                     .then(response => response.json())
                     .then(data => {
                         reloadPage()
+                        fullCart(data);
                     })
                     .catch(error => console.log(error));
-                reloadPage()
             })
             .catch(error => console.log(error));
     }
@@ -145,9 +143,14 @@
                 quantity: newQuantity
             }),
         })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response if needed
+            .then(_ => {
+                fetch('/api/cart')
+                    .then(response => response.json())
+                    .then(data => {
+                        reloadPage()
+                        fullCart(data);
+                    })
+                    .catch(error => console.log(error));
             })
             .catch(error => console.log(error));
     }
@@ -161,10 +164,14 @@
             },
             body: JSON.stringify({}),
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
-                // Handle any other actions after updating the cart status if needed
+            .then(_ => {
+                fetch('/api/cart')
+                    .then(response => response.json())
+                    .then(data => {
+                        reloadPage()
+                        fullCart(data);
+                    })
+                    .catch(error => console.log(error));
             })
             .catch(error => console.log(error));
     }
