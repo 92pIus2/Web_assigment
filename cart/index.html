@@ -61,7 +61,7 @@
             </div>
           `;
             body.appendChild(cell);
-            total_price += item.price;
+            total_price += item.price * item.count;
         }
 
         const price = document.querySelector('#price');

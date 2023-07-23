@@ -1,4 +1,5 @@
 import mysql from 'mysql';
+import {print_products} from "./test.js";
 
 const connection = mysql.createConnection({
     host: 'sql7.freesqldatabase.com',
@@ -142,4 +143,31 @@ export function get_all_products() {
             resolve(results);
         });
     });
+}
+
+export function update_images() {
+
+
+        // SQL queries to update images for specific products
+        const updateImagesQuery = `
+            UPDATE products
+            SET image = CASE
+                WHEN artist = 'Morgenshtern' THEN 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Solid_black.svg/548px-Solid_black.svg.png'
+                WHEN artist = 'Tyler, the Creator' THEN 'https://upload.wikimedia.org/wikipedia/ru/thumb/e/e4/Tyler%2C_the_Creator_-_Igor.jpg/548px-Tyler%2C_the_Creator_-_Igor.jpg'
+                WHEN artist = 'Metallica' THEN 'https://upload.wikimedia.org/wikipedia/ru/thumb/c/c2/Metallica_Album.jpg/548px-Metallica_Album.jpg'
+                WHEN artist = 'ABBA' THEN 'https://upload.wikimedia.org/wikipedia/en/6/61/ABBA_-_Voulez_Vous.jpg'
+                WHEN artist = 'Kanye West' THEN 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Solid_black.svg/548px-Solid_black.svg.png'
+                ELSE NULL
+            END
+        `;
+
+        // Executing the SQL query to update images
+        connection.query(updateImagesQuery, (error, results) => {
+            if (error) {
+                console.error('Error updating images:', error);
+                return;
+            }
+            console.log('Images updated successfully.');
+        });
+
 }

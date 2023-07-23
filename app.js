@@ -97,7 +97,7 @@ app.post('/login', (req, res) => {
 
 app.post('/add_to_cart', (req, res) => {
     const itemId = req.body.id;
-    add_product_to_cart(req.session.username, itemId, 1).then((ans) => {
+    add_product_to_cart(req.session.username, itemId, req.body.count).then((ans) => {
         console.log(ans);
         res.json({message: `Added ${itemId} to cart`});
     }).catch((error) => {
