@@ -57,7 +57,11 @@
                             <h5 class="card-title"><strong>${item.album}</strong></h5>
                             <p class="card-text"><strong>${item.artist}</strong></p>
                             <p class="card-text">${item.price} €</p>
-                            <p class="card-text">${item.count}</p>
+                            <div class="quantity-selector">
+                                <button class="btn btn-primary" onclick="changeQuantity(${item.order_item_id}, ${item.count} - 1)">-</button>
+                                <span class="mx-2" id="quantity${item.order_item_id}">${item.count}</span>
+                                <button class="btn btn-primary" onclick="changeQuantity(${item.order_item_id}, ${item.count} + 1)">+</button>
+                            </div>
                         </div>
                         <div class="card-footer text-center">
                             <button type="button" class="btn btn-danger float-end" onclick="deleteCartItem(${item.order_item_id})">Delete</button>
@@ -73,15 +77,12 @@
     }
 
     function deleteCartItem(id) {
-
         fetch(`/api/cart/${id}`, {
             method: 'DELETE'
         })
             .then(response => response.json())
             .then(data => {
-                // Handle the response data if needed
-                console.log(data.message); // Log the response message
-                // Call the function to update the cart after deletion
+                console.log(data.message);
                 fetch('/api/cart')
                     .then(response => response.json())
                     .then(data => {
@@ -125,6 +126,32 @@
             fullCart(data);
         })
         .catch(error => console.log(error));
+
+    // Function to update the quantity of an item in the cart
+    function changeQuantity(orderItemId, newQuantity) {
+        // Your logic to update the item count in the cart on the server
+        // This function should make an API call to update the item count in the database
+        // You can use fetch or any other method to communicate with your server
+        // Example API call:
+        if (newQuantity < 1) {
+            return;
+        }
+        fetch(`/api/cart/update_count/${orderItemId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                quantity: newQuantity
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response if needed
+            })
+            .catch(error => console.log(error));
+    }
+
     // Function to update cart status to "In Progress"
     function updateCartStatus() {
         fetch('/api/orders/update_cart_status_to_in_progress', {
@@ -136,7 +163,7 @@
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message); // Log the response message
+                console.log(data.message);
                 // Handle any other actions after updating the cart status if needed
             })
             .catch(error => console.log(error));

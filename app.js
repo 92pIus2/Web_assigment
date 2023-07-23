@@ -9,7 +9,7 @@ import {
     add_product_to_cart,
     get_order_items_in_cart,
     get_products_in_cart,
-    update_cart_status_to_in_progress
+    update_cart_status_to_in_progress, updateOrderItemCount
 } from "./database/orders.js";
 import {delete_order_item} from "./database/order_items.js";
 
@@ -134,6 +134,15 @@ app.post('/api/orders/update_cart_status_to_in_progress', (req, res) => {
         });
 });
 
+app.patch('/api/cart/update_count/:orderItemId', (req, res) => {
+    const orderItemId = req.params.orderItemId;
+    const newQuantity = req.body.quantity;
+
+    // Your logic to update the item count in the cart on the server
+    // You can call the updateOrderItemCount function here passing the necessary data
+    updateOrderItemCount(orderItemId, newQuantity);
+
+});
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server is running on port 3000');
 });

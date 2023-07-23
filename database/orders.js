@@ -357,10 +357,10 @@ export function update_product_count_in_cart(username, product_id, new_count) {
     });
 }
 
-function updateOrderItemCount(order_id, product_id, new_count) {
-    const updateQuery = 'UPDATE order_items SET count = ? WHERE order_id = ? AND product_id = ?';
+export function updateOrderItemCount(id, new_count) {
+    const updateQuery = 'UPDATE order_items SET count = ? WHERE id = ?';
 
-    connection.query(updateQuery, [new_count, order_id, product_id], (error) => {
+    connection.query(updateQuery, [new_count, id], (error) => {
         if (error) {
             console.error('Ошибка при обновлении количества товара в корзине:', error);
         }
