@@ -22,6 +22,7 @@
             border-color: #492c21;
             color: #FFF;
         }
+
         .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
             background-color: #573d38;
             border-color: #573d38;
@@ -66,13 +67,36 @@
     </style>
 </head>
 <body>
-<a href="/">
-    <button type="button" class="btn btn-success btn-lg float-end me-5"><strong>Log in</strong></button>
-</a>
-<a href="/cart">
-    <button type="button" class="btn btn-primary btn-lg float-end me-2"><strong>My cart</strong></button>
-</a>
-<div class="container m-3">
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-body-secondary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"
+        ><img
+                id="LOGO"
+                src="../template.png"
+                alt="LOGO"
+                draggable="false"
+                height="60"
+        /></a>
+        <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Log in</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/cart">My cart</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container m-3 mb-5">
     <h1>Items: </h1>
 
     <div class="row" id="items">
@@ -101,8 +125,8 @@
         for (let i = 0; i < items.length; i++) {
             const cell = document.createElement('div');
             const item = items[i];
-            cell.className = 'col-xxl-3 col-xl-3 col-lg-3, col-md-4 ' +
-                'col-sm-12 col-xs-12 m-3';
+            cell.className = 'col-xxl-3 col-xl-3 col-lg-3, col-md-9 ' +
+                'col-sm-12 col-xs-12 m-3 mb-md-5';
             cell.innerHTML = `
             <div class="card text-center">
             <img class="card-img-top p-3" src="../hernya.jpg" alt="Card image cap">
