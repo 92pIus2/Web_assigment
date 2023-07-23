@@ -56,7 +56,7 @@ export function update_order(id, new_status, new_total, new_email) {
 export function delete_order_item(id) {
     // SQL-запрос для удаления данных
     const deleteQuery = 'DELETE FROM order_items WHERE id = ?';
-
+    console.log('nomer', id)
     // Выполнение SQL-запроса для удаления данных
     connection.query(deleteQuery, [id], (error, results) => {
         if (error) {

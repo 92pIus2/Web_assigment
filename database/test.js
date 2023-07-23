@@ -202,3 +202,4 @@ connection.query(alterTableQuery, (error, results) => {
   // Закрываем подключение к базе данных
   connection.end();
 }); */
+print_order_items()

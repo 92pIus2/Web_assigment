@@ -5,7 +5,13 @@ import path from "path"
 import bodyParser from "body-parser";
 import {fileURLToPath} from "url";
 import {add_product, get_all_products, get_products_by_genre} from "./database/products.js";
-import {add_product_to_cart, get_products_in_cart} from "./database/orders.js";
+import {
+    add_product_to_cart,
+    get_order_items_in_cart,
+    get_products_in_cart,
+    update_cart_status_to_in_progress
+} from "./database/orders.js";
+import {delete_order_item} from "./database/order_items.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,18 +37,21 @@ app.get('/', function (req, res) {
 // API endpoint to retrieve items
 
 app.get('/api/cart', (req, res) => {
-    get_products_in_cart(req.session.username).then((products) => {
-        console.log(products); // Log the retrieved products by genre
-        res.json(products);
-    }).catch((error) => {
-        console.error(error); // Handle any errors
-    });
+    get_order_items_in_cart(req.session.username)
+        .then((orderItems) => {
+            res.json(orderItems);
+        })
+        .catch((error) => {
+            console.error(error); // Handle any errors
+            res.status(500).json({ message: 'An error occurred while retrieving cart items.' });
+        });
 });
 
+
 app.get('/api/items', (req, res) => {
-    console.log("dfdfdrgr");
+
     get_all_products().then((products) => {
-        console.log(products); // Log the retrieved products by genre
+        //console.log(products); // Log the retrieved products by genre
         res.json(products);
     }).catch((error) => {
         console.error(error); // Handle any errors
@@ -105,6 +114,25 @@ app.post('/add_to_cart', (req, res) => {
        res.json({message: `Error occurred`});
     });
 })
+
+app.delete('/api/cart/:itemId', (req, res) => {
+    const itemId = req.params.itemId;
+
+    // Call the delete_order_item function from order_items.js
+    delete_order_item(itemId)
+});
+
+app.post('/api/orders/update_cart_status_to_in_progress', (req, res) => {
+    // Call the function to update cart status to "In Progress"
+    update_cart_status_to_in_progress(req.session.username)
+        .then(() => {
+            res.json({ message: "Cart status updated to In Progress" });
+        })
+        .catch((error) => {
+            console.error(error);
+            res.json({ message: "Error occurred while updating cart status" });
+        });
+});
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server is running on port 3000');

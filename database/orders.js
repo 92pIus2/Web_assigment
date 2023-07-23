@@ -128,6 +128,31 @@ export function get_products_in_cart(username) {
     });
 }
 
+export function get_order_items_in_cart(username) {
+    return new Promise((resolve, reject) => {
+        const selectQuery = `
+            SELECT order_items.id AS order_item_id, order_items.count, products.*
+            FROM order_items
+            JOIN orders ON order_items.order_id = orders.id
+            JOIN products ON order_items.product_id = products.id
+            JOIN users ON orders.user_email = users.email
+            WHERE users.username = ? AND orders.status = 'in_cart'
+        `;
+
+        connection.query(selectQuery, [username], (error, results) => {
+            if (error) {
+                console.error('Ошибка при получении элементов заказа в корзине:', error);
+                reject(error);
+                return;
+            }
+
+            resolve(results);
+        });
+    });
+}
+
+
+
 export function add_product_to_cart(username, product_id, count) {
     return new Promise((resolve, reject) => {
         // Get the user's email based on the username
@@ -409,7 +434,7 @@ get_orders_by_user('test@test.test').then((orders) => {
 }).catch((error) => {
     console.error(error); // Handle any errors
 }); */
-/*get_products_in_cart('test').then((results) => {
+/*get_order_items_in_cart('test').then((results) => {
     console.log(results); // Log the retrieved orders in cart and associated products by username
 }).catch((error) => {
     console.error(error); // Handle any errors
