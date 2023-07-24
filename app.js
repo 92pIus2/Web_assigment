@@ -3,7 +3,7 @@ import session from "express-session"
 import path from "path"
 import bodyParser from "body-parser";
 
-import { engine } from 'express-handlebars';
+import {engine} from 'express-handlebars';
 import {fileURLToPath} from "url";
 
 import {delete_order_item} from "./database/order_items.js";
@@ -48,7 +48,7 @@ app.get('/api/cart', (req, res) => {
         })
         .catch((error) => {
             console.error(error); // Handle any errors
-            res.status(500).json({ message: 'An error occurred while retrieving cart items.' });
+            res.status(500).json({message: 'An error occurred while retrieving cart items.'});
         });
 });
 
@@ -67,7 +67,10 @@ app.get('/registration', (req, res) => {
 });
 
 app.get('/content', (req, res) => {
-    res.render('content');
+    res.render('content', {
+        loggedIn: req.session.loggedin,
+        test: "test"
+    });
 });
 
 app.get('/cart', (req, res) => {
@@ -114,13 +117,17 @@ app.post('/login', (req, res) => {
 
 app.post('/add_to_cart', (req, res) => {
     const itemId = req.body.id;
-    add_product_to_cart(req.session.username, itemId, req.body.count).then((ans) => {
-        console.log(ans);
-        res.json({message: `Added ${itemId} to cart`});
-    }).catch((error) => {
-       console.error(error);
-       res.json({message: `Error occurred`});
-    });
+    if (req.session.loggedin) {
+        add_product_to_cart(req.session.username, itemId, req.body.count).then((ans) => {
+            console.log(ans);
+            res.json({message: `Added ${itemId} to cart`});
+        }).catch((error) => {
+            console.error(error);
+            res.json({message: `Error occurred`});
+        });
+    } else {
+        res.json({message: `You need to log in!`});
+    }
 })
 
 app.delete('/api/cart/:itemId', (req, res) => {
@@ -135,11 +142,11 @@ app.post('/api/orders/update_cart_status_to_in_progress', (req, res) => {
     // Call the function to update cart status to "In Progress"
     update_cart_status_to_in_progress(req.session.username)
         .then(() => {
-            res.json({ message: "Cart status updated to In Progress" });
+            res.json({message: "Cart status updated to In Progress"});
         })
         .catch((error) => {
             console.error(error);
-            res.json({ message: "Error occurred while updating cart status" });
+            res.json({message: "Error occurred while updating cart status"});
         });
 });
 
