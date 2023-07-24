@@ -101,16 +101,16 @@
         fetch(`/api/cart/${id}`, {
             method: 'DELETE'
         })
-            .then(_ => {
-                fetch('/api/cart')
-                    .then(response => response.json())
-                    .then(data => {
-                        reloadPage()
-                        fullCart(data)
-                    })
-                    .catch(error => console.log(error));
-            })
-            .catch(error => console.log(error));
+                .then(_ => {
+                    fetch('/api/cart')
+                            .then(response => response.json())
+                            .then(data => {
+                                reloadPage()
+                                fullCart(data)
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
     }
 
     function reloadPage() {
@@ -120,26 +120,26 @@
     function fetchProductDetailsAndRenderCart(orderItems) {
         const productIds = orderItems.map((item) => item.product_id);
         fetch('/api/items')
-            .then(response => response.json())
-            .then(products => {
-                const itemsWithDetails = orderItems.map((item) => {
-                    const product = products.find((product) => product.id === item.product_id);
-                    return {
-                        ...item,
-                        ...product,
-                    };
-                });
-                fullCart(itemsWithDetails);
-            })
-            .catch(error => console.log(error));
+                .then(response => response.json())
+                .then(products => {
+                    const itemsWithDetails = orderItems.map((item) => {
+                        const product = products.find((product) => product.id === item.product_id);
+                        return {
+                            ...item,
+                            ...product,
+                        };
+                    });
+                    fullCart(itemsWithDetails);
+                })
+                .catch(error => console.log(error));
     }
 
     fetch('/api/cart')
-        .then(response => response.json())
-        .then(data => {
-            fullCart(data);
-        })
-        .catch(error => console.log(error));
+            .then(response => response.json())
+            .then(data => {
+                fullCart(data);
+            })
+            .catch(error => console.log(error));
 
     // Function to update the quantity of an item in the cart
     function changeQuantity(orderItemId, newQuantity) {
@@ -159,16 +159,16 @@
                 quantity: newQuantity
             }),
         })
-            .then(_ => {
-                fetch('/api/cart')
-                    .then(response => response.json())
-                    .then(data => {
-                        reloadPage()
-                        fullCart(data);
-                    })
-                    .catch(error => console.log(error));
-            })
-            .catch(error => console.log(error));
+                .then(_ => {
+                    fetch('/api/cart')
+                            .then(response => response.json())
+                            .then(data => {
+                                reloadPage()
+                                fullCart(data);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
     }
 
     // Function to update cart status to "In Progress"
@@ -180,16 +180,16 @@
             },
             body: JSON.stringify({}),
         })
-            .then(_ => {
-                fetch('/api/cart')
-                    .then(response => response.json())
-                    .then(data => {
-                        reloadPage()
-                        fullCart(data);
-                    })
-                    .catch(error => console.log(error));
-            })
-            .catch(error => console.log(error));
+                .then(_ => {
+                    fetch('/api/cart')
+                            .then(response => response.json())
+                            .then(data => {
+                                reloadPage()
+                                fullCart(data);
+                            })
+                            .catch(error => console.log(error));
+                })
+                .catch(error => console.log(error));
     }
 
     // Add event listener to the "Checkout" button

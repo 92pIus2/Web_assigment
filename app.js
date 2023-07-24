@@ -1,23 +1,29 @@
-import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
 import express from "express";
 import session from "express-session"
 import path from "path"
 import bodyParser from "body-parser";
+
+import { engine } from 'express-handlebars';
 import {fileURLToPath} from "url";
-import {add_product, get_all_products, get_products_by_genre} from "./database/products.js";
+
+import {delete_order_item} from "./database/order_items.js";
+import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
+import {get_all_products} from "./database/products.js";
 import {
     add_product_to_cart,
     get_order_items_in_cart,
-    get_products_in_cart,
     update_cart_status_to_in_progress, updateOrderItemCount
 } from "./database/orders.js";
-import {delete_order_item} from "./database/order_items.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
-app.set('view engine', 'html');
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', './views');
+//app.set('view engine', 'html'); this is for fast rollback, bacause now we use templating engine
+
 app.use(express.static(path.join(__dirname, '')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -30,12 +36,11 @@ app.use(
     })
 );
 
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, './authorization_form.html'));
+app.get('/', (req, res) => {
+    res.render('login');
 });
 
 // API endpoint to retrieve items
-
 app.get('/api/cart', (req, res) => {
     get_order_items_in_cart(req.session.username)
         .then((orderItems) => {
@@ -49,7 +54,6 @@ app.get('/api/cart', (req, res) => {
 
 
 app.get('/api/items', (req, res) => {
-
     get_all_products().then((products) => {
         //console.log(products); // Log the retrieved products by genre
         res.json(products);
@@ -59,15 +63,15 @@ app.get('/api/items', (req, res) => {
 });
 
 app.get('/registration', (req, res) => {
-    res.sendFile('./index.html');
+    res.render('registration');
 });
 
 app.get('/content', (req, res) => {
-    res.sendFile('./index.html');
+    res.render('content');
 });
 
 app.get('/cart', (req, res) => {
-    res.sendFile('./index.html');
+    res.render('cart');
 });
 
 app.post('/registration', (req, res) => {
@@ -143,11 +147,8 @@ app.patch('/api/cart/update_count/:orderItemId', (req, res) => {
     const orderItemId = req.params.orderItemId;
     const newQuantity = req.body.quantity;
 
-    // Your logic to update the item count in the cart on the server
-    // You can call the updateOrderItemCount function here passing the necessary data
     updateOrderItemCount(orderItemId, newQuantity);
     res.redirect("/cart")
-
 });
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server is running on port 3000');
