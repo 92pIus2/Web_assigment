@@ -74,7 +74,10 @@ app.get('/content', (req, res) => {
 });
 
 app.get('/cart', (req, res) => {
-    res.render('cart');
+    res.render('cart', {
+        loggedIn: req.session.loggedin,
+        test: "test"
+    });
 });
 
 app.post('/registration', (req, res) => {
