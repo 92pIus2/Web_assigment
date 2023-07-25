@@ -128,7 +128,6 @@ app.post('/add_to_cart', (req, res) => {
             } else {
                 add_product_to_cart(req.session.username, itemId, req.body.count).then((ans) => {
                     console.log(ans);
-                    res.json({message: `Added ${itemId} to cart`});
                 }).catch((error) => {
                     console.error(error);
                     res.json({message: `Error occurred`});

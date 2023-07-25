@@ -116,7 +116,7 @@
                 </li>
             </ul>
             <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-success" type="submit">Search</button>
             </form>
             <button class="btn outside" type="submit">Log out</button>
@@ -241,6 +241,26 @@
             quantityElement.textContent = quantity;
         }
     }
+
+    // Search items based on the input value
+    function searchItems(inputValue) {
+        const searchTerm = inputValue.trim().toLowerCase();
+        const filteredItems = itemsData.filter(item =>
+                item.album.toLowerCase().includes(searchTerm) ||
+                item.artist.toLowerCase().includes(searchTerm) ||
+                item.genre.toLowerCase().includes(searchTerm)
+        );
+        currentData = filteredItems;
+        addItems(filteredItems);
+    }
+
+    // Add an event listener to the search form
+    document.querySelector('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        searchItems(searchInput.value);
+    });
+
 
     // Fetch data from the server API
     fetch('/api/items')
