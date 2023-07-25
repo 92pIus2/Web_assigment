@@ -9,7 +9,6 @@
     <title>Cart</title>
     <style>
         body {
-            background-image: url("../fon.png");
             font-family: Arial, sans-serif;
             font-size: xx-large;
             background-color: #e9dfb1;
@@ -75,22 +74,28 @@
         for (let i = 0; i < items.length; i++) {
             const cell = document.createElement('div');
             const item = items[i];
-            cell.className = 'col-xxl-5 col-xl-5 col-lg-5 col-md-5 col-sm-12 col-xs-12 m-3';
+            cell.className = 'col-xxl-3 col-xl-4 col-lg-4 col-md-9 col-sm-12 col-xs-12 m-3';
             cell.innerHTML = `
                     <div class="card text-center" style="background-color: #e9dfb1; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
-                        <img class="card-img-top p-3" src=${item.image} alt="Card image cap">
+                        <img class="card-img-top p-3" src=${item.image} alt="Card image cap" style="object-fit: cover">
                         <div class="card-body">
-                            <h5 class="card-title"><strong>${item.album}</strong></h5>
-                            <p class="card-text"><strong>${item.artist}</strong></p>
-                            <p class="card-text">${item.price} €</p>
+                            <h5 class="card-title" style="font-size: 0.5em"><strong>${item.album}</strong></h5>
+                            <p class="card-text" style="font-size: 0.8em"><strong>${item.artist}</strong></p>
                             <div class="quantity-selector">
                                 <button class="btn btn-primary" onclick="changeQuantity(${item.order_item_id}, ${item.count} - 1)">-</button>
                                 <span class="mx-2" id="quantity${item.order_item_id}">${item.count}</span>
                                 <button class="btn btn-primary" onclick="changeQuantity(${item.order_item_id}, ${item.count} + 1)">+</button>
                             </div>
                         </div>
-                        <div class="card-footer text-center">
-                            <button type="button" class="btn btn-danger float-end" onclick="deleteCartItem(${item.order_item_id})">Delete</button>
+                        <div class="card-footer text-center ">
+                            <div class="row">
+                                <div class="col-4">
+                                    <p class="card-text" style="font-size: 1em">${item.price} €</p>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn btn-danger floar-end" style="width: 100%" id="delete" onclick="deleteCartItem(${item.order_item_id})">Delete</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
