@@ -11,7 +11,7 @@ import {add_user, checkPassword, get_user_by_username} from "./database/users.js
 import {get_all_products} from "./database/products.js";
 import {
     add_product_to_cart,
-    get_order_items_in_cart,
+    get_order_items_in_cart, isProductInCart,
     update_cart_status_to_in_progress, updateOrderItemCount
 } from "./database/orders.js";
 
@@ -121,12 +121,22 @@ app.post('/login', (req, res) => {
 app.post('/add_to_cart', (req, res) => {
     const itemId = req.body.id;
     if (req.session.loggedin) {
-        add_product_to_cart(req.session.username, itemId, req.body.count).then((ans) => {
-            console.log(ans);
-            res.json({message: `Added ${itemId} to cart`});
-        }).catch((error) => {
-            console.error(error);
-            res.json({message: `Error occurred`});
+        isProductInCart(req.session.username, itemId).then((isInCart) => {
+            console.log(itemId, " ",isInCart)
+            if (isInCart) {
+                res.json({message: `Product is already in cart, if you want to change count of items change it in cart`});
+            } else {
+                add_product_to_cart(req.session.username, itemId, req.body.count).then((ans) => {
+                    console.log(ans);
+                    res.json({message: `Added ${itemId} to cart`});
+                }).catch((error) => {
+                    console.error(error);
+                    res.json({message: `Error occurred`});
+                });
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
     } else {
         res.json({message: `You need to log in!`});

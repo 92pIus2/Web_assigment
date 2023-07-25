@@ -422,6 +422,24 @@ function updateOrderStatus(order_id, new_status) {
     });
 }
 
+export async function isProductInCart(username, product_id) {
+    try {
+        var answer = false;
+        console.log(product_id)
+        const cartItems = await get_products_in_cart(username);
+        cartItems.forEach(item => {
+            if (item.product_id == product_id) {
+                answer = true;
+            }
+        });
+        return answer;
+    } catch (error) {
+        console.error('Error checking if the product is in the cart:', error);
+        return false;
+    }
+}
+
+
 /*
 get_order_by_id(1).then((order) => {
     console.log(order); // Log the retrieved order by ID
