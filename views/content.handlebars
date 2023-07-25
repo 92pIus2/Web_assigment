@@ -147,6 +147,7 @@
 
 <script>
     const itemsData = [];
+    let currentData = [];
 
     function addToCart(itemId, quantity) {
         if (isNaN(quantity) || quantity <= 0) {
@@ -210,16 +211,17 @@
     // Filter items by genre
     function filterItems(genre) {
         const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre);
+        currentData = filteredItems;
         addItems(filteredItems);
     }
 
     function sortItemsByPrice() {
-        const sortedItems = itemsData.sort((a, b) => a.price - b.price);
+        const sortedItems = currentData.sort((a, b) => a.price - b.price);
         addItems(sortedItems);
     }
 
     function sortItemsByArtist() {
-        const sortedItems = itemsData.sort((a, b) =>  a.artist.localeCompare(b.artist));
+        const sortedItems = currentData.sort((a, b) =>  a.artist.localeCompare(b.artist));
         addItems(sortedItems);
     }
 
