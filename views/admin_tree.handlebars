@@ -105,18 +105,27 @@
         <h1>Welcome to the Admin Panel</h1>
         <center>
             <section>
-                <button class="btn outside" type="submit"><h4>Manage Orders</h4></button>
-
+                <a href="/admin/orders">
+                <button class="btn outside" type="submit" href="/admin/orders"><h4>Manage Orders</h4></button>
+                </a>
                 <!-- You can add a table with products, buttons for editing and deleting here -->
             </section>
 
             <section>
+                <a href="/admin/products">
                 <button class="btn outside" type="submit"><h4>Manage Products</h4></button>
+                </a>
                 <!-- You can add a table with orders, buttons for updating status, and viewing details here -->
             </section>
         </center>
     </div>
 </main>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+        integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+        crossorigin="anonymous"></script>
 </body>
 </html>

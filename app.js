@@ -8,7 +8,7 @@ import {fileURLToPath} from "url";
 
 import {delete_order_item} from "./database/order_items.js";
 import {add_user, checkPassword, get_user_by_username, update_user_by_username} from "./database/users.js";
-import {get_all_products} from "./database/products.js";
+import {add_product, delete_product, get_all_products} from "./database/products.js";
 import {
     add_product_to_cart,
     get_order_items_in_cart, isProductInCart,
@@ -100,6 +100,28 @@ app.get('/admin', (req, res) => {
     }
 });
 
+app.get('/admin/orders', (req, res) => {
+    if (req.session.username === "admin") {
+        res.render('manage_orders');
+    } else {
+        res.redirect('/content');
+    }
+});
+
+app.get('/admin/products', (req, res) => {
+    if (req.session.username === "admin") {
+        res.render('manage_products');
+    } else {
+        res.redirect('/content');
+    }
+});
+
+app.delete('/api/admin/:itemId', (req, res) => {
+    const itemId = req.params.itemId;
+    delete_product(itemId)
+    res.render('manage_products');
+});
+
 app.post('/registration', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -110,6 +132,18 @@ app.post('/registration', (req, res) => {
     //res.send('Registration successful!');
     res.redirect("/");
 });
+
+app.post('/admin/add_product', (req, res) => {
+    const id = Math.floor(Math.random() * 1000);
+    const url = req.body.url;
+    const arist = req.body.artist;
+    const album = req.body.album;
+    const price = req.body.price;
+    const genre = req.body.genre;
+
+    add_product(id, arist, album, price, genre);
+    res.render('manage_products');
+})
 
 app.post('/login', (req, res) => {
     const username = req.body.username;
@@ -129,7 +163,7 @@ app.post('/login', (req, res) => {
                         res.redirect('/content');
                     }
                 } else {
-                    alert("Wrong password, try again!");
+                    res.send("Wrong password, try again!");
                 }
             }).catch((error) => {
                 console.log(error);

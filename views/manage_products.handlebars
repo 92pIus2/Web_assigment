@@ -28,6 +28,7 @@
             border-color: #573d38;
             color: #FFF;
         }
+
         .overlay {
             display: none;
             position: fixed;
@@ -38,6 +39,7 @@
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 9999;
         }
+
         .container_of_adding_things {
             display: none;
             position: fixed;
@@ -50,10 +52,12 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             z-index: 10000;
         }
+
         .container {
             padding: 10px;
             margin-top: 20px;
         }
+
         ffrom {
             display: compact;
             text-align: left;
@@ -61,6 +65,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
@@ -171,21 +176,24 @@
 <button class="btn-primary orientation" onclick="toggleOverlay()">Add a new product</button>
 <div class="overlay" id="overlay"></div>
 <div class="container_of_adding_things" id="container_of_adding_things">
-    <center><ffrom action="/submit" method="post" enctype="multipart/ffrom-data">
-        <center><label for="image">Upload image:</label>
-            <input type="file" id="image" name="image" accept="image/*" required>
+    <center>
+        <form action="/admin/add_product" method="post" enctype="application/x-www-form-urlencoded">
+            <center><label for="url">Upload image:</label>
+                <input type="url" id="url" name="image" required>
 
-            <label for="objectName">Name:</label>
-            <input type="text" id="objectName" name="objectName" required>
+                <label for="artist">Artist:</label>
+                <input type="text" id="artist" name="artist" required>
 
-            <label for="objectClass">Genre:</label>
-            <input type="text" id="objectClass" name="objectClass" required>
+                <label for="album">Album:</label>
+                <input type="text" id="album" name="album" required>
 
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" min="0" step="0.1" required></center>
-    </ffrom>
+                <label for="genre">Genre:</label>
+                <input type="text" id="genre" name="genre" required>
 
-        <button class="btn-primary">Apply</button>
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" min="0" step="1" required></center>
+            <button class="btn-primary" type="submit">Apply</button>
+        </form>
         <button class="btn-primary" onclick="toggleOverlay()">Cancel</button>
     </center>
 </div>
