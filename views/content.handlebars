@@ -151,6 +151,8 @@
     </div>
     <div class="row" id="items">
     </div>
+    <ul class="pagination justify-content-center" id="pagination">
+    </ul>
 </div>
 
 <script>
@@ -220,17 +222,28 @@
     function filterItems(genre) {
         const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre);
         currentData = filteredItems;
-        addItems(filteredItems);
+
+        const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+        generatePaginationLinks(totalPages);
+
+        addItemsByPage(1);
     }
 
     function sortItemsByPrice() {
         const sortedItems = currentData.sort((a, b) => a.price - b.price);
-        addItems(sortedItems);
+
+        const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
+        generatePaginationLinks(totalPages);
+        addItemsByPage(1);
     }
 
     function sortItemsByArtist() {
         const sortedItems = currentData.sort((a, b) => a.artist.localeCompare(b.artist));
-        addItems(sortedItems);
+
+        const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
+        generatePaginationLinks(totalPages);
+
+        addItemsByPage(1);
     }
 
     // Change quantity selector value
@@ -253,7 +266,10 @@
                 item.genre.toLowerCase().includes(searchTerm)
         );
         currentData = filteredItems;
-        addItems(filteredItems);
+
+        const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+        generatePaginationLinks(totalPages);
+        addItemsByPage(1);
     }
 
     // Add an event listener to the search form
@@ -263,13 +279,43 @@
         searchItems(searchInput.value);
     });
 
+    const itemsPerPage = 3; // Change this value to adjust the number of items per page
+
+    // Add items based on page number
+    function addItemsByPage(pageNumber) {
+        const startIndex = (pageNumber - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const itemsToShow = currentData.slice(startIndex, endIndex);
+        addItems(itemsToShow);
+    }
+
+    // Generate the pagination links
+    function generatePaginationLinks(totalPages) {
+        const paginationContainer = document.getElementById('pagination');
+        paginationContainer.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.classList.add('page-item');
+
+            const link = document.createElement('a');
+            link.classList.add('page-link');
+            link.textContent = i;
+            link.addEventListener('click', function () {
+                addItemsByPage(i);
+            });
+
+            li.appendChild(link);
+            paginationContainer.appendChild(li);
+        }
+    }
 
     // Fetch data from the server API
     fetch('/api/items')
             .then(response => response.json())
             .then(data => {
-                itemsData.push(...data)
-                addItems(data);
+                itemsData.push(...data);
+                filterItems('all'); // Start by showing all items
             })
             .catch(error => console.log(error));
 
