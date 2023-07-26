@@ -134,7 +134,7 @@ app.post('/registration', (req, res) => {
     add_user(email, username, password);
 
     //res.send('Registration successful!');
-    res.redirect("/login");
+    res.redirect("/sign_in");
 });
 
 app.post('/admin/add_product', (req, res) => {
