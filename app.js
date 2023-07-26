@@ -10,9 +10,9 @@ import {delete_order_item} from "./database/order_items.js";
 import {add_user, checkPassword, get_user_by_username, update_user_by_username} from "./database/users.js";
 import {add_product, delete_product, get_all_products} from "./database/products.js";
 import {
-    add_product_to_cart,
+    add_product_to_cart, get_in_progress_orders,
     get_order_items_in_cart, get_user_orders, isProductInCart,
-    update_cart_status_to_in_progress, updateOrderItemCount
+    update_cart_status_to_in_progress, updateOrderItemCount, updateOrderStatus
 } from "./database/orders.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -134,14 +134,13 @@ app.post('/registration', (req, res) => {
 });
 
 app.post('/admin/add_product', (req, res) => {
-    const id = Math.floor(Math.random() * 1000);
     const url = req.body.url;
     const arist = req.body.artist;
     const album = req.body.album;
     const price = req.body.price;
     const genre = req.body.genre;
 
-    add_product(id, arist, album, price, genre, url);
+    add_product(arist, album, price, genre, url);
     res.redirect('/admin/products');
 })
 
@@ -238,6 +237,17 @@ app.post('/update_user_by_username', (req, res) => {
     }
 });
 
+app.post('/api/proceed_order', async(req, res) => {
+    try {
+        const order_id = req.body.order_id;
+        updateOrderStatus(order_id, "done");
+        res.redirect("/admin/orders");
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        res.status(500).json({ error: 'An error occurred while fetching user orders' });
+    }
+});
+
 app.get('/get_user_email', (req, res) => {
     const username = req.session.username;
     console.log(username);
@@ -267,6 +277,16 @@ app.get('/get_user_orders', async (req, res) => {
         // const username = '...'; // Replace this with the currently logged-in username
 
         const orders = await get_user_orders(username);
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        res.status(500).json({ error: 'An error occurred while fetching user orders' });
+    }
+});
+
+app.get('/get_orders_in_progress', async (req, res) => {
+    try {
+        const orders = await get_in_progress_orders();
         res.json(orders);
     } catch (error) {
         console.error('Error fetching user orders:', error);

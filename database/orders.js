@@ -415,7 +415,7 @@ export function update_cart_status_to_in_progress(username) {
     });
 }
 
-function updateOrderStatus(order_id, new_status) {
+export function updateOrderStatus(order_id, new_status) {
     const updateQuery = 'UPDATE orders SET status = ? WHERE id = ?';
 
     connection.query(updateQuery, [new_status, order_id], (error) => {
@@ -535,6 +535,8 @@ export async function get_in_progress_orders() {
                 const total = products.reduce((acc, product) => acc + product.totalPrice, 0);
 
                 return {
+                    order_id: order.id,
+                    email: order.user_email,
                     products,
                     status: order.status,
                     total: total, // Total without decimal places (whole number)
