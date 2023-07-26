@@ -199,33 +199,9 @@
 </div>
 
 <div class="container m-3">
-    <div class="row">
-        <div class="col-5 mb-5">
-            <div>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('all')">All Genres</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('metal')">Metal</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('hip-hop')">Hip-Hop</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('disco')">Disco</button>
-                <!-- Add more genre buttons here -->
-            </div>
-        </div>
-        <div class="col-5 mb-auto">
-            <div class="dropdown">
-                <button type="button" class="btn btn-primary text-start dropdown-toggle"
-                        data-bs-toggle="dropdown">
-                    Sort by:
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="sortItemsByPrice()">Price</a></li>
-                    <li><a class="dropdown-item" onclick="sortItemsByArtist()">Artist name</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
     <div class="row" id="items">
     </div>
 </div>
-
 
 <script>
     function toggleOverlay() {
@@ -292,36 +268,6 @@
         }
     }
 
-    // Initialize items on page load
-    // Filter items by genre
-    function filterItems(genre) {
-        const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre);
-        currentData = filteredItems;
-        addItems(filteredItems);
-    }
-
-    function sortItemsByPrice() {
-        const sortedItems = currentData.sort((a, b) => a.price - b.price);
-        addItems(sortedItems);
-    }
-
-    function sortItemsByArtist() {
-        const sortedItems = currentData.sort((a, b) => a.artist.localeCompare(b.artist));
-        addItems(sortedItems);
-    }
-
-    // Change quantity selector value
-    function changeQuantity(selectorId, change) {
-        const quantityElement = document.getElementById(selectorId);
-        let quantity = parseInt(quantityElement.textContent);
-        if (!isNaN(quantity)) {
-            quantity += change;
-            if (quantity < 1) quantity = 1;
-            quantityElement.textContent = quantity;
-        }
-    }
-
-    // Search items based on the input value
     function searchItems(inputValue) {
         const searchTerm = inputValue.trim().toLowerCase();
         const filteredItems = itemsData.filter(item =>
@@ -330,7 +276,7 @@
                 item.genre.toLowerCase().includes(searchTerm)
         );
         currentData = filteredItems;
-        addItems(filteredItems);
+        addItems(filteredItems)
     }
 
     // Add an event listener to the search form
