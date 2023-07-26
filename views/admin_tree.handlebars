@@ -8,7 +8,6 @@
     <title>Admin Panel</title>
     <style>
         body {
-            background-image: url("../fon.png");
             font-family: Arial, sans-serif;
             font-size: xx-large;
             background-color: #e9dfb1;
@@ -16,11 +15,16 @@
             background-position: top center;
             background-repeat: no-repeat;
         }
-        .outside {
-            margin-right: 10px;
-            width: 100%;
-            background-color: lightsalmon;
+        .btn-primary {
+            width: 70%;
             height: 100px;
+            background-color: #492c21;
+            border-color: #573d38;
+        }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background-color: #573d38;
+            border-color: #573d38;
+            color: #FFF;
         }
         .container {
             background-color: lightgoldenrodyellow;
@@ -106,14 +110,14 @@
         <center>
             <section>
                 <a href="/admin/orders">
-                <button class="btn outside" type="submit" href="/admin/orders"><h4>Manage Orders</h4></button>
+                <button class="btn btn-primary m-2" type="submit" href="/admin/orders"><h4>Manage Orders</h4></button>
                 </a>
                 <!-- You can add a table with products, buttons for editing and deleting here -->
             </section>
 
             <section>
                 <a href="/admin/products">
-                <button class="btn outside" type="submit"><h4>Manage Products</h4></button>
+                <button class="btn btn-primary m-2" type="submit"><h4>Manage Products</h4></button>
                 </a>
                 <!-- You can add a table with orders, buttons for updating status, and viewing details here -->
             </section>

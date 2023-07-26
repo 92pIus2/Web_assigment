@@ -9,6 +9,7 @@
     <style>
         body {
             background-color: #e9dfb1;
+            font-size: xx-large;
             font-family: Arial, sans-serif;
         }
 
@@ -51,6 +52,9 @@
         table table th {
             background-color: #e0cca8;
         }
+        .invert {
+            filter: invert(1);
+        }
     </style>
 </head>
 <body>
@@ -59,11 +63,23 @@
         <a class="navbar-brand" href="#">
             <img class="invert" id="LOGO" src="../template.png" alt="LOGO" draggable="false" height="60"/>
         </a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbarCollapse" style="">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Back to admin panel</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 <div>
     <h2 style="margin: 2%; width: 96%;">Pending orders:</h2>
-    <table>
+    <table style="font-size: large;">
         <thead>
         <tr>
             <th>ID</th>
@@ -146,17 +162,6 @@
                     alert('An error occurred while fetching order history.');
                 });
     }
-
-    // JavaScript для генерации случайного числа и отображения его в надписи "итого:"
-    // Для каждой таблички создадим отдельное случайное число и отобразим его в соответствующей надписи.
-    const total1Element = document.getElementById("total1");
-    const total2Element = document.getElementById("total2");
-
-    const total1Value = Math.floor(Math.random() * 100); // Случайное число от 0 до 99 для первой таблички
-    const total2Value = Math.floor(Math.random() * 100); // Случайное число от 0 до 99 для второй таблички
-
-    total1Element.textContent = "$" + total1Value;
-    total2Element.textContent = "$" + total2Value;
 </script>
 
 

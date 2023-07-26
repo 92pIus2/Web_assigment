@@ -148,8 +148,11 @@
                 <button class="btn btn-primary genre-btn" onclick="filterItems('all')">All Genres</button>
                 <button class="btn btn-primary genre-btn" onclick="filterItems('metal')">Metal</button>
                 <button class="btn btn-primary genre-btn" onclick="filterItems('hip-hop')">Hip-Hop</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('disco')">Disco</button>
-                <!-- Add more genre buttons here -->
+                <button class="btn btn-primary genre-btn" onclick="filterItems('pop')">Pop</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('house')">House</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('r&b')">R&B</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('rock')">Rock</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('jazz')">Jazz</button>
             </div>
         </div>
         <div class="col-5 mb-auto">
@@ -169,6 +172,62 @@
     </div>
     <ul class="pagination justify-content-center" id="pagination">
     </ul>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4" style="color: #492c21">Recent News:</h1>
+        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="../template.png" alt="News 1" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="carousel-caption" style="color: #492c21">
+                                <h3>Summer Sale!</h3>
+                                <p>Get ready for the hottest deals of the season. Enjoy massive discounts on your favorite music albums.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="../template.png" alt="News 2" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="carousel-caption" style="color: #492c21">
+                                <h3>New Arrivals</h3>
+                                <p>Discover the latest music releases from top artists. Shop now to stay updated with the best music trends.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="../template.png" alt="News 3" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="carousel-caption" style="color: #492c21">
+                                <h3>Free Shipping</h3>
+                                <p>Enjoy free shipping on all orders above $50. Shop now and get your favorite albums delivered to your doorstep at no extra cost.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                    data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                    data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -208,8 +267,8 @@
             <div class="card text-center" style="background-color: #e9dfb1; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
             <img class="card-img-top p-3" src=${item.image} alt="Card image cap" style="object-fit: cover">
             <div class="card-body">
-                <h5 class="card-title"><strong>${item.album}</strong></h5>
-                <p class="card-text"><strong>${item.artist}</strong></p>
+                <h5 class="card-title" style="font-size: 0.6em;"><strong>${item.album}</strong></h5>
+                <p class="card-text" style="font-size: 0.8em;"><strong>${item.artist}</strong></p>
                 <p class="card-text">${item.genre}</p>
                 <div class="quantity-selector">
                     <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', -1)">-</button>
@@ -220,7 +279,7 @@
             <div class="card-footer text-center ">
                 <div class="row">
                     <div class="col-4">
-                        <p class="card-text" style="font-size: 1em">${item.price} €</p>
+                        <p class="card-text" style="font-size: 0.9em">${item.price} €</p>
                     </div>
                     <div class="col">
                         <button type="button" class="btn btn-success" style="width: 100%" id="add" onclick="addToCart('${item.id}', document.getElementById('quantity${item.id}').textContent)">Add to Cart</button>

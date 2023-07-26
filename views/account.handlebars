@@ -130,13 +130,13 @@
         </div>
     </div>
 </nav>
-<div>
+<div class="m-5">
     <!-- Displayed user information will be updated dynamically -->
     <h2>Profile Information</h2>
     <p>Username: <span id="usernamePlaceholder"></span></p>
     <p>Email: <span id="emailPlaceholder"></span></p>
 </div>
-<div>
+<div class="m-5">
     <!-- Update account details form -->
     <h2>Update your Profile</h2>
     <form id="updateForm">
@@ -149,12 +149,19 @@
         <button type="submit">Update</button>
     </form>
 </div>
-<div>
+<div class="m-5">
     <!-- Order History in Table Format -->
     <h2>Order History</h2>
     <!-- Add a loading message -->
     <p id="loadingMessage">Loading...</p>
     <table id="orderHistoryTable" style="display: none;">
+        <thead>
+        <tr>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Products</th>
+        </tr>
+        </thead>
         <!-- Order details will be updated dynamically here -->
     </table>
 </div>
@@ -208,7 +215,6 @@
                     data.forEach(order => {
                         const orderRow = document.createElement('tr');
                         orderRow.innerHTML = `
-                            <td>${order.order_id}</td>
                             <td>${order.status}</td>
                             <td>${order.total} €</td>
                             <td>
