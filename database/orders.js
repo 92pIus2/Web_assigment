@@ -491,6 +491,25 @@ export async function get_user_orders(username) {
     }
 }
 
+export async function get_orders_by_status(status) {
+    return new Promise((resolve, reject) => {
+        // SQL query to get orders by status
+        const selectQuery = 'SELECT * FROM orders WHERE status = ?';
+
+        // Execute SQL query to get orders by status
+        connection.query(selectQuery, [status], (error, results) => {
+            if (error) {
+                console.error('Error fetching orders by status:', error);
+                reject(error);
+                return;
+            }
+
+            // Return the retrieved orders
+            resolve(results);
+        });
+    });
+}
+
 export async function get_in_progress_orders() {
     try {
         const orders = await get_orders_by_status('in_progress');
@@ -543,8 +562,8 @@ get_orders_by_user('test@test.test').then((orders) => {
 }).catch((error) => {
     console.error(error); // Handle any errors
 }); */
-/*get_user_orders('test').then((results) => {
+/*get_in_progress_orders().then((results) => {
     console.log(results); // Log the retrieved orders in cart and associated products by username
 }).catch((error) => {
     console.error(error); // Handle any errors
-});*/
+})*/

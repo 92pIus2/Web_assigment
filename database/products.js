@@ -22,23 +22,40 @@ connection.connect((error) => {
 // price
 // genre
 
-export function add_product(id, artist, album, price, genre) {
-    // SQL-запрос для вставки данных
-    const insertQuery = `
-        INSERT INTO products (id, artist, album, price, genre)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-    const values = [id, artist, album, price, genre];
+export function add_product(artist, album, price, genre) {
+    // Query to get the maximum existing id from the products table
+    const getMaxIdQuery = 'SELECT MAX(id) AS max_id FROM products';
 
-    // Выполнение SQL-запроса для вставки данных
-    connection.query(insertQuery, values, (error) => {
+    connection.query(getMaxIdQuery, (error, results) => {
         if (error) {
-            console.error('Ошибка вставки данных:', error);
+            console.error('Error getting maximum id:', error);
             return;
         }
-        console.log('Данные вставлены успешно');
+
+        // Get the maximum existing id from the query results
+        const maxId = results[0].max_id;
+
+        // Calculate the new id for the product (maximum existing id + 1)
+        const newId = maxId + 1;
+
+        // SQL query to insert the new product with the calculated id
+        const insertQuery = `
+            INSERT INTO products (id, artist, album, price, genre)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const values = [newId, artist, album, price, genre];
+
+        // Execute SQL query to insert the new product
+        connection.query(insertQuery, values, (error) => {
+            if (error) {
+                console.error('Error inserting data:', error);
+                return;
+            }
+            console.log('Data inserted successfully');
+        });
     });
 }
+
 
 export function update_product(id, new_artist, new_album, new_price, new_genre) {
     // Выполняем SQL-запрос для обновления данных
