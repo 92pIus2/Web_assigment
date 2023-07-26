@@ -179,7 +179,7 @@
     <center>
         <form action="/admin/add_product" method="post" enctype="application/x-www-form-urlencoded">
             <center><label for="url">Upload image:</label>
-                <input type="url" id="url" name="image" required>
+                <input type="url" id="url" name="url" required>
 
                 <label for="artist">Artist:</label>
                 <input type="text" id="artist" name="artist" required>
@@ -240,25 +240,24 @@
     const itemsData = [];
     let currentData = [];
 
-    function addToCart(itemId, quantity) {
-        if (isNaN(quantity) || quantity <= 0) {
-            alert('Invalid quantity. Please enter a valid number greater than 0.');
-            return;
-        }
-
-        fetch('/add_to_cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'id': itemId,
-                'count': quantity
-            }),
+    function deleteItem(id) {
+        fetch(`/api/admin/${id}`, {
+            method: 'DELETE'
         })
-                .then(response => response.json())
-                .then(response => alert(response.message))
+                .then(_ => {
+                    fetch('/api/items')
+                            .then(response => response.json())
+                            .then(data => {
+                                reloadPage()
+                                addItems(data)
+                            })
+                            .catch(error => console.log(error));
+                })
                 .catch(error => console.log(error));
+    }
+
+    function reloadPage() {
+        window.location.href = '/admin/products';
     }
 
     function addItems(items) {
@@ -276,11 +275,6 @@
                 <h5 class="card-title"><strong>${item.album}</strong></h5>
                 <p class="card-text"><strong>${item.artist}</strong></p>
                 <p class="card-text">${item.genre}</p>
-                <div class="quantity-selector">
-                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', -1)">-</button>
-                    <span class="mx-2" id="quantity${item.id}">1</span>
-                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', 1)">+</button>
-                </div>
             </div>
             <div class="card-footer text-center ">
                 <div class="row">
@@ -288,7 +282,7 @@
                         <p class="card-text" style="font-size: 1em">${item.price} €</p>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn btn-success" style="width: 100%" id="add" onclick="addToCart('${item.id}', document.getElementById('quantity${item.id}').textContent)">Add to Cart</button>
+                        <button type="button" class="btn btn-danger" style="width: 100%" id="delete" onclick="deleteItem('${item.id}')">Delete</button>
                     </div>
                 </div>
             </div>

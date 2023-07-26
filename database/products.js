@@ -22,13 +22,13 @@ connection.connect((error) => {
 // price
 // genre
 
-export function add_product(id, artist, album, price, genre) {
+export function add_product(id, artist, album, price, genre, image) {
     // SQL-запрос для вставки данных
     const insertQuery = `
-        INSERT INTO products (id, artist, album, price, genre)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO products (id, artist, album, price, genre, image)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const values = [id, artist, album, price, genre];
+    const values = [id, artist, album, price, genre, image];
 
     // Выполнение SQL-запроса для вставки данных
     connection.query(insertQuery, values, (error) => {

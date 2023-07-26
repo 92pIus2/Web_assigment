@@ -119,7 +119,7 @@ app.get('/admin/products', (req, res) => {
 app.delete('/api/admin/:itemId', (req, res) => {
     const itemId = req.params.itemId;
     delete_product(itemId)
-    res.render('manage_products');
+    res.redirect('/admin/products');
 });
 
 app.post('/registration', (req, res) => {
@@ -141,8 +141,8 @@ app.post('/admin/add_product', (req, res) => {
     const price = req.body.price;
     const genre = req.body.genre;
 
-    add_product(id, arist, album, price, genre);
-    res.render('manage_products');
+    add_product(id, arist, album, price, genre, url);
+    res.redirect('/admin/products');
 })
 
 app.post('/login', (req, res) => {
