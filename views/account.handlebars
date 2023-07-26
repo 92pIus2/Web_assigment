@@ -1,118 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<style>
-    body {
-        background-color: #e9dfb1;
-    }
-    /* Basic styling for the table */
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    th, td {
-        border: 1px solid #492c21;
-        padding: 8px;
-        text-align: left;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-
-    /* Styling for the nested table */
-    td table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    td table th, td table td {
-        border: 1px solid #492c21;
-        padding: 5px;
-        text-align: left;
-    }
-
-    td table th {
-        background-color: #f9f9f9;
-    }
-
-    /* Styling for the 'Update' button */
-    button[type="submit"] {
-        margin-top: 10px;
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-    }
-
-    /* Styling for the 'Update Account Details' section */
-    #updateForm {
-        max-width: 300px;
-        margin-top: 20px;
-    }
-
-    #updateForm label {
-        display: block;
-        margin-bottom: 8px;
-    }
-
-    #updateForm input[type="text"],
-    #updateForm input[type="password"] {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-</style>
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <title>User Account</title>
-    <!-- ... (include CSS and other necessary scripts) ... -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e9dfb1;
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+        }
+
+        /* Basic styling for the table */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #492c21;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Styling for the nested table */
+        td table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td table th,
+        td table td {
+            border: 1px solid #492c21;
+            padding: 5px;
+            text-align: left;
+        }
+
+        td table th {
+            background-color: #f9f9f9;
+        }
+
+        /* Styling for the 'Update' button */
+        button[type="submit"] {
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* Styling for the 'Update Account Details' section */
+        #updateForm {
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
+        #updateForm label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        #updateForm input[type="text"],
+        #updateForm input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* New styles for loading message */
+        #loadingMessage {
+            font-size: 18px;
+            color: #492c21;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .invert {
+            filter: invert(1);
+        }
+
+        .outside {
+            margin-right: 10px;
+            background-color: dodgerblue;
+        }
+
+        .navbar {
+            font-size: xx-large;
+            background-color: #573d38;
+        }
+    </style>
 </head>
 
 <body>
-<h1>User Account Page</h1>
+<nav class="navbar navbar-expand-md navbar-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img class="invert" id="LOGO" src="../template.png" alt="LOGO" draggable="false" height="60" />
+        </a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbarCollapse" style="">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                {{#unless loggedIn}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Log in</a>
+                    </li>
+                {{/unless}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/content">Continue shopping</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <div>
     <!-- Displayed user information will be updated dynamically -->
-    <h2>User Information</h2>
+    <h2>Profile Information</h2>
     <p>Username: <span id="usernamePlaceholder"></span></p>
     <p>Email: <span id="emailPlaceholder"></span></p>
 </div>
 <div>
-    <!-- Order History in Table Format -->
-    <h2>Order History</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Status</th>
-            <th>Total</th>
-            <th>Products</th>
-        </tr>
-        </thead>
-        <tbody id="orderHistoryTable">
-        <!-- Order details will be updated dynamically here -->
-        </tbody>
-    </table>
-</div>
-<div>
     <!-- Update account details form -->
-    <h2>Update Account Details</h2>
+    <h2>Update your Profile</h2>
     <form id="updateForm">
-        <label for="newUsername">Username:</label>
+        <label for="newUsername">new Username:</label>
         <input type="text" id="newUsername" name="newUsername" required>
 
-        <label for="newPassword">Password:</label>
+        <label for="newPassword">new Password:</label>
         <input type="password" id="newPassword" name="newPassword" required>
 
         <button type="submit">Update</button>
     </form>
+</div>
+<div>
+    <!-- Order History in Table Format -->
+    <h2>Order History</h2>
+    <!-- Add a loading message -->
+    <p id="loadingMessage">Loading...</p>
+    <table id="orderHistoryTable" style="display: none;">
+        <!-- Order details will be updated dynamically here -->
+    </table>
 </div>
 <script>
     document.getElementById('usernamePlaceholder').textContent = '{{username}}'; // Set initial username value
@@ -151,41 +195,45 @@
     }
 
     function getOrderHistory() {
+        const loadingMessage = document.getElementById('loadingMessage');
+        const orderHistoryTable = document.getElementById('orderHistoryTable');
+
         fetch('/get_user_orders') // Replace with the actual API endpoint to get user orders
                 .then(response => response.json())
                 .then(data => {
-                    const orderHistoryTable = document.getElementById('orderHistoryTable');
-                    orderHistoryTable.innerHTML = ''; // Clear any placeholder content
+                    loadingMessage.style.display = 'none'; // Hide the loading message
+                    orderHistoryTable.style.display = 'table'; // Show the table
 
+                    // Populate the order history table
                     data.forEach(order => {
                         const orderRow = document.createElement('tr');
                         orderRow.innerHTML = `
-                        <td>${order.order_id}</td>
-                        <td>${order.status}</td>
-                        <td>$${order.total}</td>
-                        <td>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Artist</th>
-                                    <th>Album</th>
-                                    <th>Count</th>
-                                    <th>Price</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                ${order.products.map(product => `
-                                    <tr>
-                                        <td>${product.artist}</td>
-                                        <td>${product.album}</td>
-                                        <td>${product.count}</td>
-                                        <td>$${product.price}</td>
-                                    </tr>
-                                `).join('')}
-                                </tbody>
-                            </table>
-                        </td>
-                    `;
+                            <td>${order.order_id}</td>
+                            <td>${order.status}</td>
+                            <td>${order.total} €</td>
+                            <td>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Artist</th>
+                                            <th>Album</th>
+                                            <th>Count</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${order.products.map(product => `
+                                            <tr>
+                                                <td>${product.artist}</td>
+                                                <td>${product.album}</td>
+                                                <td>${product.count}</td>
+                                                <td>${product.price} €</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </td>
+                        `;
                         orderHistoryTable.appendChild(orderRow);
                     });
                 })
@@ -195,7 +243,6 @@
                 });
     }
 
-    // Function to update user data
     function updateUserData(username, newUsername, newPassword) {
         // Send a request to the server to update user data
         fetch(`/update_user_by_username`, {
@@ -212,7 +259,6 @@
         document.getElementById('usernamePlaceholder').textContent = newUsername;
     }
 </script>
-
 </body>
 
 </html>
