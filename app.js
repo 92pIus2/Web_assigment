@@ -80,6 +80,14 @@ app.get('/cart', (req, res) => {
     });
 });
 
+app.get('/admin', (req, res) => {
+    if (req.session.username === "admin") {
+        res.render('admin_tree');
+    } else {
+        res.redirect('/content');
+    }
+});
+
 app.post('/registration', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -103,7 +111,11 @@ app.post('/login', (req, res) => {
                 if (status) {
                     req.session.loggedin = true;
                     req.session.username = username;
-                    res.redirect('/content');
+                    if (username === "admin") {
+                        res.redirect('/admin');
+                    } else {
+                        res.redirect('/content');
+                    }
                 } else {
                     alert("Wrong password, try again!");
                 }

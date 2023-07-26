@@ -116,7 +116,8 @@
                 </li>
             </ul>
             <form class="d-flex" role="search">
-                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search" aria-label="Search">
+                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search"
+                       aria-label="Search">
                 <button class="btn btn-success" type="submit">Search</button>
             </form>
             <button class="btn outside" type="submit">Profile</button>
@@ -137,7 +138,8 @@
         </div>
         <div class="col-5 mb-auto">
             <div class="dropdown">
-                <button type="button" class="btn btn-primary text-start dropdown-toggle" data-bs-toggle="dropdown">
+                <button type="button" class="btn btn-primary text-start dropdown-toggle"
+                        data-bs-toggle="dropdown">
                     Sort by:
                 </button>
                 <ul class="dropdown-menu">
@@ -227,7 +229,7 @@
     }
 
     function sortItemsByArtist() {
-        const sortedItems = currentData.sort((a, b) =>  a.artist.localeCompare(b.artist));
+        const sortedItems = currentData.sort((a, b) => a.artist.localeCompare(b.artist));
         addItems(sortedItems);
     }
 
@@ -270,6 +272,7 @@
                 addItems(data);
             })
             .catch(error => console.log(error));
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
