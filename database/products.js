@@ -22,7 +22,7 @@ connection.connect((error) => {
 // price
 // genre
 
-export function add_product(artist, album, price, genre) {
+export function add_product(artist, album, price, genre, image) {
     // Query to get the maximum existing id from the products table
     const getMaxIdQuery = 'SELECT MAX(id) AS max_id FROM products';
 
@@ -40,10 +40,10 @@ export function add_product(artist, album, price, genre) {
 
         // SQL query to insert the new product with the calculated id
         const insertQuery = `
-            INSERT INTO products (id, artist, album, price, genre)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO products (id, artist, album, price, genre, image)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
-        const values = [newId, artist, album, price, genre];
+        const values = [newId, artist, album, price, genre, image];
 
         // Execute SQL query to insert the new product
         connection.query(insertQuery, values, (error) => {

@@ -28,6 +28,7 @@
             border-color: #573d38;
             color: #FFF;
         }
+
         .overlay {
             display: none;
             position: fixed;
@@ -38,6 +39,7 @@
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 9999;
         }
+
         .container_of_adding_things {
             display: none;
             position: fixed;
@@ -50,10 +52,12 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             z-index: 10000;
         }
+
         .container {
             padding: 10px;
             margin-top: 20px;
         }
+
         ffrom {
             display: compact;
             text-align: left;
@@ -61,6 +65,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
@@ -171,53 +176,32 @@
 <button class="btn-primary orientation" onclick="toggleOverlay()">Add a new product</button>
 <div class="overlay" id="overlay"></div>
 <div class="container_of_adding_things" id="container_of_adding_things">
-    <center><ffrom action="/submit" method="post" enctype="multipart/ffrom-data">
-        <center><label for="image">Upload image:</label>
-            <input type="file" id="image" name="image" accept="image/*" required>
+    <center>
+        <form action="/admin/add_product" method="post" enctype="application/x-www-form-urlencoded">
+            <center><label for="url">Upload image:</label>
+                <input type="url" id="url" name="url" required>
 
-            <label for="objectName">Name:</label>
-            <input type="text" id="objectName" name="objectName" required>
+                <label for="artist">Artist:</label>
+                <input type="text" id="artist" name="artist" required>
 
-            <label for="objectClass">Genre:</label>
-            <input type="text" id="objectClass" name="objectClass" required>
+                <label for="album">Album:</label>
+                <input type="text" id="album" name="album" required>
 
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" min="0" step="0.1" required></center>
-    </ffrom>
+                <label for="genre">Genre:</label>
+                <input type="text" id="genre" name="genre" required>
 
-        <button class="btn-primary">Apply</button>
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" min="0" step="1" required></center>
+            <button class="btn-primary" type="submit">Apply</button>
+        </form>
         <button class="btn-primary" onclick="toggleOverlay()">Cancel</button>
     </center>
 </div>
 
 <div class="container m-3">
-    <div class="row">
-        <div class="col-5 mb-5">
-            <div>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('all')">All Genres</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('metal')">Metal</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('hip-hop')">Hip-Hop</button>
-                <button class="btn btn-primary genre-btn" onclick="filterItems('disco')">Disco</button>
-                <!-- Add more genre buttons here -->
-            </div>
-        </div>
-        <div class="col-5 mb-auto">
-            <div class="dropdown">
-                <button type="button" class="btn btn-primary text-start dropdown-toggle"
-                        data-bs-toggle="dropdown">
-                    Sort by:
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" onclick="sortItemsByPrice()">Price</a></li>
-                    <li><a class="dropdown-item" onclick="sortItemsByArtist()">Artist name</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
     <div class="row" id="items">
     </div>
 </div>
-
 
 <script>
     function toggleOverlay() {
@@ -232,25 +216,24 @@
     const itemsData = [];
     let currentData = [];
 
-    function addToCart(itemId, quantity) {
-        if (isNaN(quantity) || quantity <= 0) {
-            alert('Invalid quantity. Please enter a valid number greater than 0.');
-            return;
-        }
-
-        fetch('/add_to_cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                'id': itemId,
-                'count': quantity
-            }),
+    function deleteItem(id) {
+        fetch(`/api/admin/${id}`, {
+            method: 'DELETE'
         })
-                .then(response => response.json())
-                .then(response => alert(response.message))
+                .then(_ => {
+                    fetch('/api/items')
+                            .then(response => response.json())
+                            .then(data => {
+                                reloadPage()
+                                addItems(data)
+                            })
+                            .catch(error => console.log(error));
+                })
                 .catch(error => console.log(error));
+    }
+
+    function reloadPage() {
+        window.location.href = '/admin/products';
     }
 
     function addItems(items) {
@@ -268,11 +251,6 @@
                 <h5 class="card-title"><strong>${item.album}</strong></h5>
                 <p class="card-text"><strong>${item.artist}</strong></p>
                 <p class="card-text">${item.genre}</p>
-                <div class="quantity-selector">
-                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', -1)">-</button>
-                    <span class="mx-2" id="quantity${item.id}">1</span>
-                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', 1)">+</button>
-                </div>
             </div>
             <div class="card-footer text-center ">
                 <div class="row">
@@ -280,7 +258,7 @@
                         <p class="card-text" style="font-size: 1em">${item.price} €</p>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn btn-success" style="width: 100%" id="add" onclick="addToCart('${item.id}', document.getElementById('quantity${item.id}').textContent)">Add to Cart</button>
+                        <button type="button" class="btn btn-danger" style="width: 100%" id="delete" onclick="deleteItem('${item.id}')">Delete</button>
                     </div>
                 </div>
             </div>
@@ -290,36 +268,6 @@
         }
     }
 
-    // Initialize items on page load
-    // Filter items by genre
-    function filterItems(genre) {
-        const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre);
-        currentData = filteredItems;
-        addItems(filteredItems);
-    }
-
-    function sortItemsByPrice() {
-        const sortedItems = currentData.sort((a, b) => a.price - b.price);
-        addItems(sortedItems);
-    }
-
-    function sortItemsByArtist() {
-        const sortedItems = currentData.sort((a, b) => a.artist.localeCompare(b.artist));
-        addItems(sortedItems);
-    }
-
-    // Change quantity selector value
-    function changeQuantity(selectorId, change) {
-        const quantityElement = document.getElementById(selectorId);
-        let quantity = parseInt(quantityElement.textContent);
-        if (!isNaN(quantity)) {
-            quantity += change;
-            if (quantity < 1) quantity = 1;
-            quantityElement.textContent = quantity;
-        }
-    }
-
-    // Search items based on the input value
     function searchItems(inputValue) {
         const searchTerm = inputValue.trim().toLowerCase();
         const filteredItems = itemsData.filter(item =>
@@ -328,7 +276,7 @@
                 item.genre.toLowerCase().includes(searchTerm)
         );
         currentData = filteredItems;
-        addItems(filteredItems);
+        addItems(filteredItems)
     }
 
     // Add an event listener to the search form
