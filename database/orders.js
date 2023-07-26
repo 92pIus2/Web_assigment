@@ -1,4 +1,7 @@
 import mysql from 'mysql'
+import {get_user_by_username} from "./users.js";
+import {get_product_by_id} from "./products.js";
+import {get_order_items_by_order_id} from "./order_items.js";
 
 
 const connection = mysql.createConnection({
@@ -439,6 +442,94 @@ export async function isProductInCart(username, product_id) {
     }
 }
 
+export async function get_user_orders(username) {
+    try {
+        const user = await get_user_by_username(username);
+
+        if (!user) {
+            console.error('User not found');
+            return [];
+        }
+
+        const orders = await get_orders_by_user(user.email);
+
+        // Filter out orders with status 'in_cart'
+        const filteredOrders = orders.filter(order => order.status !== 'in_cart');
+
+        const userOrders = await Promise.all(
+            filteredOrders.map(async (order) => {
+                const orderItems = await get_order_items_by_order_id(order.id);
+                const products = await Promise.all(
+                    orderItems.map(async (item) => {
+                        const product = await get_product_by_id(item.product_id);
+                        const totalPrice = product.price * item.count;
+                        return {
+                            artist: product.artist,
+                            album: product.album,
+                            count: item.count,
+                            price: product.price,
+                            totalPrice: totalPrice, // Total price without decimal places (whole number)
+                        };
+                    })
+                );
+
+                // Calculate the total for this order
+                const total = products.reduce((acc, product) => acc + product.totalPrice, 0);
+
+                return {
+                    products,
+                    status: order.status,
+                    total: total, // Total without decimal places (whole number)
+                };
+            })
+        );
+
+        return userOrders;
+    } catch (error) {
+        console.error('Error getting user orders:', error);
+        return [];
+    }
+}
+
+export async function get_in_progress_orders() {
+    try {
+        const orders = await get_orders_by_status('in_progress');
+
+        const inProgressOrders = await Promise.all(
+            orders.map(async (order) => {
+                const orderItems = await get_order_items_by_order_id(order.id);
+                const products = await Promise.all(
+                    orderItems.map(async (item) => {
+                        const product = await get_product_by_id(item.product_id);
+                        const totalPrice = product.price * item.count;
+                        return {
+                            artist: product.artist,
+                            album: product.album,
+                            count: item.count,
+                            price: product.price,
+                            totalPrice: totalPrice, // Total price without decimal places (whole number)
+                        };
+                    })
+                );
+
+                // Calculate the total for this order
+                const total = products.reduce((acc, product) => acc + product.totalPrice, 0);
+
+                return {
+                    products,
+                    status: order.status,
+                    total: total, // Total without decimal places (whole number)
+                };
+            })
+        );
+
+        return inProgressOrders;
+    } catch (error) {
+        console.error('Error getting in-progress orders:', error);
+        return [];
+    }
+}
+
 
 /*
 get_order_by_id(1).then((order) => {
@@ -452,7 +543,7 @@ get_orders_by_user('test@test.test').then((orders) => {
 }).catch((error) => {
     console.error(error); // Handle any errors
 }); */
-/*get_order_items_in_cart('test').then((results) => {
+/*get_user_orders('test').then((results) => {
     console.log(results); // Log the retrieved orders in cart and associated products by username
 }).catch((error) => {
     console.error(error); // Handle any errors

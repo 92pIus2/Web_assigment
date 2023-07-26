@@ -11,7 +11,7 @@ import {add_user, checkPassword, get_user_by_username, update_user_by_username} 
 import {add_product, delete_product, get_all_products} from "./database/products.js";
 import {
     add_product_to_cart,
-    get_order_items_in_cart, isProductInCart,
+    get_order_items_in_cart, get_user_orders, isProductInCart,
     update_cart_status_to_in_progress, updateOrderItemCount
 } from "./database/orders.js";
 
@@ -234,6 +234,7 @@ app.post('/update_user_by_username', (req, res) => {
     if (username === req.session.username) {
         // Call the update_user_by_username function to update the user's data
         update_user_by_username(username, newUsername, newPassword)
+        req.session.username = newUsername;
     }
 });
 
@@ -257,6 +258,20 @@ app.get('/get_user_email', (req, res) => {
             console.error('Error fetching user email:', error);
             res.status(500).json({ error: 'An error occurred while fetching user email' });
         });
+});
+
+app.get('/get_user_orders', async (req, res) => {
+    try {
+        const  username = req.session.username;
+        // Assuming you have a variable "username" containing the currently logged-in username
+        // const username = '...'; // Replace this with the currently logged-in username
+
+        const orders = await get_user_orders(username);
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        res.status(500).json({ error: 'An error occurred while fetching user orders' });
+    }
 });
 
 app.listen(process.env.PORT || 3000, () => {

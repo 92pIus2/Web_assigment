@@ -17,13 +17,21 @@
     <p>Email: <span id="emailPlaceholder"></span></p>
 </div>
 <div>
-    <!-- Placeholder content for order history -->
+    <!-- Order History in Table Format -->
     <h2>Order History</h2>
-    <ul>
-        <li>Order #12345 - Total: $50.00</li>
-        <li>Order #67890 - Total: $30.00</li>
-        <!-- Add more order details here -->
-    </ul>
+    <table>
+        <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Products</th>
+        </tr>
+        </thead>
+        <tbody id="orderHistoryTable">
+        <!-- Order details will be updated dynamically here -->
+        </tbody>
+    </table>
 </div>
 <div>
     <!-- Update account details form -->
@@ -41,6 +49,7 @@
 <script>
     document.getElementById('usernamePlaceholder').textContent = '{{username}}'; // Set initial username value
     getUserEmail();
+    getOrderHistory();
 
     // Update account details form submission
     document.getElementById('updateForm').addEventListener('submit', function (event) {
@@ -70,6 +79,51 @@
                 .catch(error => {
                     console.error('Error fetching user email:', error);
                     alert('An error occurred while fetching user email.');
+                });
+    }
+
+    function getOrderHistory() {
+        fetch('/get_user_orders') // Replace with the actual API endpoint to get user orders
+                .then(response => response.json())
+                .then(data => {
+                    const orderHistoryTable = document.getElementById('orderHistoryTable');
+                    orderHistoryTable.innerHTML = ''; // Clear any placeholder content
+
+                    data.forEach(order => {
+                        const orderRow = document.createElement('tr');
+                        orderRow.innerHTML = `
+                        <td>${order.order_id}</td>
+                        <td>${order.status}</td>
+                        <td>$${order.total}</td>
+                        <td>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Artist</th>
+                                    <th>Album</th>
+                                    <th>Count</th>
+                                    <th>Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                ${order.products.map(product => `
+                                    <tr>
+                                        <td>${product.artist}</td>
+                                        <td>${product.album}</td>
+                                        <td>${product.count}</td>
+                                        <td>$${product.price}</td>
+                                    </tr>
+                                `).join('')}
+                                </tbody>
+                            </table>
+                        </td>
+                    `;
+                        orderHistoryTable.appendChild(orderRow);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching order history:', error);
+                    alert('An error occurred while fetching order history.');
                 });
     }
 
