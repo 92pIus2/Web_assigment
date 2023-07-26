@@ -123,6 +123,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Log in</a>
                     </li>
+                {{else}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">Profile</a>
+                    </li>
                 {{/unless}}
                 <li class="nav-item">
                     <a class="nav-link" href="/cart">My cart</a>
@@ -133,7 +137,6 @@
                        aria-label="Search">
                 <button class="btn btn-success" type="submit">Search</button>
             </form>
-            <button class="btn outside" type="submit">Profile</button>
         </div>
     </div>
 </nav>
@@ -268,6 +271,16 @@
             if (quantity < 1) quantity = 1;
             quantityElement.textContent = quantity;
         }
+    }
+
+    function redirectToAccountPage() {
+        window.location.href = '/account';
+    }
+
+    // Add an event listener to the "Profile" button
+    const profileBtn = document.querySelector('a[href="/account"]');
+    if (profileBtn) {
+        profileBtn.addEventListener('click', redirectToAccountPage);
     }
 
     // Search items based on the input value

@@ -36,12 +36,12 @@ export function add_user(email, username, password) {
         console.log('Данные вставлены успешно');
     });
 }
-export function update_user_by_username(username, new_email, new_password) {
+export function update_user_by_username(username, new_username, new_password) {
 
 // Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE users SET email = ?, password = ? WHERE username = ?';
+    const updateQuery = 'UPDATE users SET password = ?, username = ? WHERE username = ?';
 
-    connection.query(updateQuery, [new_email, new_password, username], (error, results) => {
+    connection.query(updateQuery, [new_password, new_username, username], (error, results) => {
         if (error) {
             console.error('Ошибка при обновлении данных:', error);
             // Обработка ошибки
@@ -52,12 +52,12 @@ export function update_user_by_username(username, new_email, new_password) {
     });
 }
 
-export function update_user_by_email(email, new_username, new_password) {
+export function update_user_by_email(email, new_email, new_password) {
 
 // Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE users SET username = ?, password = ? WHERE email = ?';
+    const updateQuery = 'UPDATE users SET email = ?, password = ? WHERE email = ?';
 
-    connection.query(updateQuery, [new_username, new_password, email], (error, results) => {
+    connection.query(updateQuery, [new_email, new_password, email], (error, results) => {
         if (error) {
             console.error('Ошибка при обновлении данных:', error);
             // Обработка ошибки

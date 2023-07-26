@@ -7,7 +7,7 @@ import {engine} from 'express-handlebars';
 import {fileURLToPath} from "url";
 
 import {delete_order_item} from "./database/order_items.js";
-import {add_user, checkPassword, get_user_by_username} from "./database/users.js";
+import {add_user, checkPassword, get_user_by_username, update_user_by_username} from "./database/users.js";
 import {get_all_products} from "./database/products.js";
 import {
     add_product_to_cart,
@@ -52,6 +52,18 @@ app.get('/api/cart', (req, res) => {
         });
 });
 
+app.get('/account', (req, res) => {
+    if (!req.session.loggedin) {
+        res.render('content', {
+            loggedIn: req.session.loggedin
+        });
+    } else {
+        res.render('account', {
+            loggedIn: req.session.loggedin,
+            username: req.session.username
+        });
+    }
+});
 
 app.get('/api/items', (req, res) => {
     get_all_products().then((products) => {
@@ -181,6 +193,38 @@ app.patch('/api/cart/update_count/:orderItemId', (req, res) => {
     updateOrderItemCount(orderItemId, newQuantity);
     res.redirect("/cart")
 });
+
+app.post('/update_user_by_username', (req, res) => {
+    // Extract data from the request body
+    const { username, newUsername, newPassword } = req.body;
+    if (username === req.session.username) {
+        // Call the update_user_by_username function to update the user's data
+        update_user_by_username(username, newUsername, newPassword)
+    }
+});
+
+app.get('/get_user_email', (req, res) => {
+    const username = req.session.username;
+    console.log(username);
+    // Call the get_user_by_username function to fetch the user's email
+    get_user_by_username(username)
+        .then(user => {
+            console.log(user)
+            if (user) {
+                // User found, send the email in the response
+                console.log(user.email)
+                res.json({ email: user.email });
+            } else {
+                // User not found, send an error response
+                res.status(404).json({ error: 'User not found' });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user email:', error);
+            res.status(500).json({ error: 'An error occurred while fetching user email' });
+        });
+});
+
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server is running on port 3000');
 });
