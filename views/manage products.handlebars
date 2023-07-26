@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <title>Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: xx-large;
+            background-color: #e5deb8;
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+        }
+
+        .btn-primary {
+            background-color: #492c21;
+            border-color: #492c21;
+            color: #FFF;
+        }
+
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background-color: #573d38;
+            border-color: #573d38;
+            color: #FFF;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+        }
+        .container_of_adding_things {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: blanchedalmond;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+        }
+        .container {
+            padding: 10px;
+            margin-top: 20px;
+        }
+        ffrom {
+            display: compact;
+            text-align: left;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="file"], input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #492c21;
+        }
+
+        table {
+            display: flex;
+            flex-wrap: wrap;
+            border-collapse: separate;
+            border-spacing: 20px;
+            margin-top: 20px;
+            table-layout: auto;
+        }
+
+        th, td {
+            background: rgb(255, 255, 255);
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #492c21;
+        }
+
+        td {
+            color: #492c21;
+        }
+
+        .genre-btn {
+            margin-right: 10px;
+        }
+
+        .orientation {
+            float: right;
+            margin-right: 100px;
+            margin-top: 20px;
+            background-color: forestgreen;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar {
+            background-color: #573d38;
+        }
+
+        .invert {
+            filter: invert(1);
+        }
+
+        .button-on-cart {
+            background-color: rgb(35, 79, 76);
+        }
+    </style>
+</head>
+
+<nav class="navbar navbar-expand-md navbar-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img class="invert" id="LOGO" src="../template.png" alt="LOGO" draggable="false" height="60"/>
+        </a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbarCollapse" style="">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                {{#unless loggedIn}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Log in</a>
+                    </li>
+                {{/unless}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart">My cart</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search"
+                       aria-label="Search">
+                <button class="btn btn-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<button class="btn-primary orientation" onclick="toggleOverlay()">Add a new product</button>
+<div class="overlay" id="overlay"></div>
+<div class="container_of_adding_things" id="container_of_adding_things">
+    <center><ffrom action="/submit" method="post" enctype="multipart/ffrom-data">
+        <center><label for="image">Upload image:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+
+            <label for="objectName">Name:</label>
+            <input type="text" id="objectName" name="objectName" required>
+
+            <label for="objectClass">Genre:</label>
+            <input type="text" id="objectClass" name="objectClass" required>
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" min="0" step="0.1" required></center>
+    </ffrom>
+
+        <button class="btn-primary">Apply</button>
+        <button class="btn-primary" onclick="toggleOverlay()">Cancel</button>
+    </center>
+</div>
+
+<div class="container m-3">
+    <div class="row">
+        <div class="col-5 mb-5">
+            <div>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('all')">All Genres</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('metal')">Metal</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('hip-hop')">Hip-Hop</button>
+                <button class="btn btn-primary genre-btn" onclick="filterItems('disco')">Disco</button>
+                <!-- Add more genre buttons here -->
+            </div>
+        </div>
+        <div class="col-5 mb-auto">
+            <div class="dropdown">
+                <button type="button" class="btn btn-primary text-start dropdown-toggle"
+                        data-bs-toggle="dropdown">
+                    Sort by:
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" onclick="sortItemsByPrice()">Price</a></li>
+                    <li><a class="dropdown-item" onclick="sortItemsByArtist()">Artist name</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="items">
+    </div>
+</div>
+
+
+<script>
+    function toggleOverlay() {
+        const overlay = document.getElementById('overlay');
+        const container_of_adding_things = document.getElementById('container_of_adding_things');
+        overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        container_of_adding_things.style.display = container_of_adding_things.style.display === 'block' ? 'none' : 'block';
+    }
+</script>
+
+<script>
+    const itemsData = [];
+    let currentData = [];
+
+    function addToCart(itemId, quantity) {
+        if (isNaN(quantity) || quantity <= 0) {
+            alert('Invalid quantity. Please enter a valid number greater than 0.');
+            return;
+        }
+
+        fetch('/add_to_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'id': itemId,
+                'count': quantity
+            }),
+        })
+                .then(response => response.json())
+                .then(response => alert(response.message))
+                .catch(error => console.log(error));
+    }
+
+    function addItems(items) {
+        const body = document.querySelector('#items');
+        body.innerHTML = '';
+
+        for (let i = 0; i < items.length; i++) {
+            const cell = document.createElement('div');
+            const item = items[i];
+            cell.className = 'col-xxl-3 col-xl-4 col-lg-4 col-md-9 col-sm-12 col-xs-12 m-3';
+            cell.innerHTML = `
+            <div class="card text-center" style="background-color: #e9dfb1; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+            <img class="card-img-top p-3" src=${item.image} alt="Card image cap" style="object-fit: cover">
+            <div class="card-body">
+                <h5 class="card-title"><strong>${item.album}</strong></h5>
+                <p class="card-text"><strong>${item.artist}</strong></p>
+                <p class="card-text">${item.genre}</p>
+                <div class="quantity-selector">
+                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', -1)">-</button>
+                    <span class="mx-2" id="quantity${item.id}">1</span>
+                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', 1)">+</button>
+                </div>
+            </div>
+            <div class="card-footer text-center ">
+                <div class="row">
+                    <div class="col-4">
+                        <p class="card-text" style="font-size: 1em">${item.price} €</p>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-success" style="width: 100%" id="add" onclick="addToCart('${item.id}', document.getElementById('quantity${item.id}').textContent)">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+          `;
+            body.appendChild(cell);
+        }
+    }
+
+    // Initialize items on page load
+    // Filter items by genre
+    function filterItems(genre) {
+        const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre);
+        currentData = filteredItems;
+        addItems(filteredItems);
+    }
+
+    function sortItemsByPrice() {
+        const sortedItems = currentData.sort((a, b) => a.price - b.price);
+        addItems(sortedItems);
+    }
+
+    function sortItemsByArtist() {
+        const sortedItems = currentData.sort((a, b) => a.artist.localeCompare(b.artist));
+        addItems(sortedItems);
+    }
+
+    // Change quantity selector value
+    function changeQuantity(selectorId, change) {
+        const quantityElement = document.getElementById(selectorId);
+        let quantity = parseInt(quantityElement.textContent);
+        if (!isNaN(quantity)) {
+            quantity += change;
+            if (quantity < 1) quantity = 1;
+            quantityElement.textContent = quantity;
+        }
+    }
+
+    // Search items based on the input value
+    function searchItems(inputValue) {
+        const searchTerm = inputValue.trim().toLowerCase();
+        const filteredItems = itemsData.filter(item =>
+                item.album.toLowerCase().includes(searchTerm) ||
+                item.artist.toLowerCase().includes(searchTerm) ||
+                item.genre.toLowerCase().includes(searchTerm)
+        );
+        currentData = filteredItems;
+        addItems(filteredItems);
+    }
+
+    // Add an event listener to the search form
+    document.querySelector('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        searchItems(searchInput.value);
+    });
+
+
+    // Fetch data from the server API
+    fetch('/api/items')
+            .then(response => response.json())
+            .then(data => {
+                itemsData.push(...data)
+                addItems(data);
+            })
+            .catch(error => console.log(error));
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+        integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
