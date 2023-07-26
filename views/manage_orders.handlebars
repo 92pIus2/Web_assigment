@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+    <title>Табличка с использованием Bootstrap</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #e9dfb1;
+        }
+        hr {
+            color: black; /* Цвет линии (красный) */
+            border: 2px solid; /* Толщина линии и тип (сплошная) */
+            margin: 20px; /* Внешние отступы сверху и снизу */
+        }
+        h3 {
+            font-weight: bold;
+            margin: auto;
+        }
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <center><h1>Manage orders</h1></center>
+    <h3>User 1</h3>
+    <div class="row">
+        <div class="col">Artist</div>
+        <div class="col">Album</div>
+        <div class="col">Price</div>
+        <div class="col">Count</div>
+    </div>
+    <div class="row">
+        <div class="col">Исполнитель 1</div>
+        <div class="col">Альбом 1</div>
+        <div class="col">$10</div>
+        <div class="col">5</div>
+    </div>
+    <h5>Итого: <span id="total1"></span>
+        <button class="btn btn-primary">Done</button></h5>
+    <hr>
+    <h3>User 2</h3>
+    <div class="row">
+        <div class="col" >Artist</div>
+        <div class="col">Album</div>
+        <div class="col">Price</div>
+        <div class="col">Count</div>
+    </div>
+    <div class="row">
+        <div class="col">Исполнитель 2</div>
+        <div class="col">Альбом 2</div>
+        <div class="col">$15</div>
+        <div class="col">3</div>
+    </div>
+    <div class="row">
+        <div class="col">Исполнитель 3</div>
+        <div class="col">Альбом 3</div>
+        <div class="col">$20</div>
+        <div class="col">7</div>
+    </div>
+    <h5>Итого: <span id="total2"></span>
+        <button class="btn btn-primary mb-auto">Done</button></h5>
+    <hr>
+</div>
+<script>
+    // JavaScript для генерации случайного числа и отображения его в надписи "итого:"
+    // Для каждой таблички создадим отдельное случайное число и отобразим его в соответствующей надписи.
+    const total1Element = document.getElementById("total1");
+    const total2Element = document.getElementById("total2");
+
+    const total1Value = Math.floor(Math.random() * 100); // Случайное число от 0 до 99 для первой таблички
+    const total2Value = Math.floor(Math.random() * 100); // Случайное число от 0 до 99 для второй таблички
+
+    total1Element.textContent = "$" + total1Value;
+    total2Element.textContent = "$" + total2Value;
+</script>
+
+
+<!-- Подключение Bootstrap JS и зависимостей jQuery (необходимо для некоторых Bootstrap компонентов) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
