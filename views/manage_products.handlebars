@@ -148,35 +148,10 @@
         <a class="navbar-brand" href="#">
             <img class="invert" id="LOGO" src="../template.png" alt="LOGO" draggable="false" height="60"/>
         </a>
-        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse" id="navbarCollapse" style="">
-            <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                {{#unless loggedIn}}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Log in</a>
-                    </li>
-                {{/unless}}
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart">My cart</a>
-                </li>
-            </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" id="searchInput" type="search" placeholder="Search"
-                       aria-label="Search">
-                <button class="btn btn-success" type="submit">Search</button>
-            </form>
-        </div>
     </div>
-</nav>
-
-<button class="btn-primary orientation" onclick="toggleOverlay()">Add a new product</button>
-<div class="overlay" id="overlay"></div>
-<div class="container_of_adding_things" id="container_of_adding_things">
-    <center>
+    <button class="btn-primary orientation" style="width: 20%" onclick="toggleOverlay()">Add a new product</button>
+    <div class="overlay" id="overlay"></div>
+    <div class="container_of_adding_things" id="container_of_adding_things">
         <form action="/admin/add_product" method="post" enctype="application/x-www-form-urlencoded">
             <center><label for="url">Upload image:</label>
                 <input type="url" id="url" name="url" required>
@@ -195,8 +170,8 @@
             <button class="btn-primary" type="submit">Apply</button>
         </form>
         <button class="btn-primary" onclick="toggleOverlay()">Cancel</button>
-    </center>
-</div>
+    </div>
+</nav>
 
 <div class="container m-3">
     <div class="row" id="items">

@@ -37,6 +37,10 @@ app.use(
 );
 
 app.get('/', (req, res) => {
+    res.render('content');
+});
+
+app.get('/sign_in', (req, res) => {
     res.render('login');
 });
 
