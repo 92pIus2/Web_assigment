@@ -1,148 +1,104 @@
-import mysql from 'mysql'
 
+import firebase from "firebase/compat/app";
+import {} from "firebase/compat/database";
 
-const connection = mysql.createConnection({
-    host: 'sql7.freesqldatabase.com',
-    user: 'sql7634155',
-    password: 'twVQVPvpFA',
-    database: 'sql7634155'
-});
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAORF8cH1QIAuYICrYMtgAwb5UCz4OKgxQ",
+    authDomain: "webvinyl-4912c.firebaseapp.com",
+    databaseURL: "https://webvinyl-4912c-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "webvinyl-4912c",
+    storageBucket: "webvinyl-4912c.appspot.com",
+    messagingSenderId: "1017529934891",
+    appId: "1:1017529934891:web:7d3448757b9bc14376b66e",
+    measurementId: "G-KDPE4VBBJM"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-connection.connect((error) => {
-    if (error) {
-        console.error('Ошибка подключения к базе данных:', error);
-        return;
-    }
-    console.log('Подключено к базе данных MySQL');
-});
-//id
-//order_id
-//product_id
-//count
-export function add_order_item(id, order_id, product_id, count){
-    // SQL-запрос для вставки данных
-    const insertQuery = `
-  INSERT INTO order_items (id, order_id, product_id, count)
-  VALUES (?, ?, ?, ?)
-`;
-    const values = [id, order_id, product_id, count];
+export function add_order_item(id, order_id, product_id, count) {
+    const orderItemsRef = database.ref('order_items');
 
-    // Выполнение SQL-запроса для вставки данных
-    connection.query(insertQuery, values, (error) => {
+    orderItemsRef.child(id).set({
+        id: id,
+        order_id: order_id,
+        product_id: product_id,
+        count: count
+    }, (error) => {
         if (error) {
-            console.error('Ошибка вставки данных:', error);
-            return;
+            console.error('Error adding order item:', error);
+        } else {
+            console.log('Order item added successfully');
         }
-        console.log('Данные вставлены успешно');
     });
 }
 
 export function update_order(id, new_status, new_total, new_email) {
+    const orderRef = database.ref('orders').child(id);
 
-// Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE orders SET status = ?, total = ?, user_email = ? WHERE id = ?';
-
-    connection.query(updateQuery, [new_status, new_total, new_email, id], (error, results) => {
+    orderRef.update({
+        status: new_status,
+        total: new_total,
+        user_email: new_email
+    }, (error) => {
         if (error) {
-            console.error('Ошибка при обновлении данных:', error);
-            // Обработка ошибки
+            console.error('Error updating order:', error);
         } else {
-            console.log('Данные успешно обновлены!');
-            // Дополнительные действия при успешном обновлении данных
+            console.log('Order updated successfully');
         }
     });
 }
 
 export function delete_order_item(id) {
-    // SQL-запрос для удаления данных
-    const deleteQuery = 'DELETE FROM order_items WHERE id = ?';
-    console.log('nomer', id)
-    // Выполнение SQL-запроса для удаления данных
-    connection.query(deleteQuery, [id], (error, results) => {
+    const orderItemRef = database.ref('order_items').child(id);
+
+    orderItemRef.remove((error) => {
         if (error) {
-            console.error('Ошибка при удалении элемента заказа:', error);
-            return;
+            console.error('Error deleting order item:', error);
+        } else {
+            console.log('Order item deleted successfully');
         }
-        console.log('Элемент заказа успешно удален');
     });
 }
 
 export function get_order_item_by_id(id) {
     return new Promise((resolve, reject) => {
-        // SQL-запрос для получения элемента заказа по ID
-        const selectQuery = 'SELECT * FROM order_items WHERE id = ?';
+        const orderItemRef = database.ref('order_items').child(id);
 
-        // Выполнение SQL-запроса для получения элемента заказа
-        connection.query(selectQuery, [id], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении элемента заказа:', error);
-                reject(error);
-                return;
-            }
-
-            // Возвращаем результаты
-            resolve(results[0]);
+        orderItemRef.once('value', snapshot => {
+            const orderItem = snapshot.val();
+            resolve(orderItem);
+        }, error => {
+            console.error('Error getting order item:', error);
+            reject(error);
         });
     });
 }
 
 export function get_order_items_by_order_id(order_id) {
     return new Promise((resolve, reject) => {
-        // SQL-запрос для получения элементов заказа по ID заказа
-        const selectQuery = 'SELECT * FROM order_items WHERE order_id = ?';
+        const orderItemsRef = database.ref('order_items');
 
-        // Выполнение SQL-запроса для получения элементов заказа
-        connection.query(selectQuery, [order_id], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении элементов заказа:', error);
-                reject(error);
-                return;
-            }
-
-            // Возвращаем результаты
-            resolve(results);
+        orderItemsRef.orderByChild('order_id').equalTo(order_id).once('value', snapshot => {
+            const orderItems = snapshot.val();
+            resolve(Object.values(orderItems));
+        }, error => {
+            console.error('Error getting order items by order ID:', error);
+            reject(error);
         });
     });
 }
 
 export function get_order_by_product_id(product_id) {
     return new Promise((resolve, reject) => {
-        // SQL-запрос для получения заказа по ID продукта
-        const selectQuery = `
-            SELECT orders.*
-            FROM orders
-            INNER JOIN order_items ON orders.id = order_items.order_id
-            WHERE order_items.product_id = ?
-        `;
+        const ordersRef = database.ref('orders');
 
-        // Выполнение SQL-запроса для получения заказа
-        connection.query(selectQuery, [product_id], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении заказа:', error);
-                reject(error);
-                return;
-            }
-
-            // Возвращаем результаты
-            resolve(results);
+        ordersRef.orderByChild('order_items/product_id').equalTo(product_id).once('value', snapshot => {
+            const orders = snapshot.val();
+            resolve(Object.values(orders));
+        }, error => {
+            console.error('Error getting orders by product ID:', error);
+            reject(error);
         });
     });
 }
-/*
-get_order_item_by_id(1).then((orderItem) => {
-    console.log(orderItem); // Log the retrieved order item by ID
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
-
-get_order_items_by_order_id(1).then((orderItems) => {
-    console.log(orderItems); // Log the retrieved order items by order ID
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
-
-get_order_by_product_id(1).then((orders) => {
-    console.log(orders); // Log the retrieved orders by product ID
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});*/

@@ -153,10 +153,10 @@ app.post('/login', (req, res) => {
     const password = req.body.password;
 
     get_user_by_username(username).then((user) => {
-        console.log(user); // Log the retrieved user by username
+        //console.log(user); // Log the retrieved user by username
         if (user != null) {
             checkPassword(username, password).then((status) => {
-                console.log(status);
+                //console.log(status);
                 if (status) {
                     req.session.loggedin = true;
                     req.session.username = username;
@@ -183,7 +183,7 @@ app.post('/add_to_cart', (req, res) => {
     const itemId = req.body.id;
     if (req.session.loggedin) {
         isProductInCart(req.session.username, itemId).then((isInCart) => {
-            console.log(itemId, " ",isInCart)
+            //console.log(itemId, " ",isInCart)
             if (isInCart) {
                 res.json({message: `Product is already in cart, if you want to change count of items change it in cart`});
             } else {
@@ -254,11 +254,11 @@ app.post('/api/proceed_order', async(req, res) => {
 
 app.get('/get_user_email', (req, res) => {
     const username = req.session.username;
-    console.log(username);
+    //console.log(username);
     // Call the get_user_by_username function to fetch the user's email
     get_user_by_username(username)
         .then(user => {
-            console.log(user)
+            //console.log(user)
             if (user) {
                 // User found, send the email in the response
                 console.log(user.email)
@@ -301,3 +301,4 @@ app.get('/get_orders_in_progress', async (req, res) => {
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server is running on port 3000');
 });
+

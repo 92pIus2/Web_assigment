@@ -1,448 +1,104 @@
-import mysql from 'mysql'
-import {get_user_by_username} from "./users.js";
-import {get_product_by_id} from "./products.js";
-import {get_order_items_by_order_id} from "./order_items.js";
+import { get_user_by_username } from "./users.js";
+import { get_product_by_id } from "./products.js";
+import {add_order_item, get_order_items_by_order_id} from "./order_items.js";
 
+import firebase from "firebase/compat/app";
+import {} from "firebase/compat/database";
 
-const connection = mysql.createConnection({
-    host: 'sql7.freesqldatabase.com',
-    user: 'sql7634155',
-    password: 'twVQVPvpFA',
-    database: 'sql7634155'
-});
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAORF8cH1QIAuYICrYMtgAwb5UCz4OKgxQ",
+    authDomain: "webvinyl-4912c.firebaseapp.com",
+    databaseURL: "https://webvinyl-4912c-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "webvinyl-4912c",
+    storageBucket: "webvinyl-4912c.appspot.com",
+    messagingSenderId: "1017529934891",
+    appId: "1:1017529934891:web:7d3448757b9bc14376b66e",
+    measurementId: "G-KDPE4VBBJM"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-connection.connect((error) => {
-    if (error) {
-        console.error('Ошибка подключения к базе данных:', error);
-        return;
-    }
-    console.log('Подключено к базе данных MySQL');
-});
-
-//id
-//status
-//total
-//user_email
-export function add_order(id, email, total){
-    // SQL-запрос для вставки данных
-    const insertQuery = `
-  INSERT INTO orders (id, status, total, user_email)
-  VALUES (?, ?, ?, ?)
-`;
-    const values = [id, 'in_cart', total, email];
-
-    // Выполнение SQL-запроса для вставки данных
-    connection.query(insertQuery, values, (error) => {
+// Add order to database
+export function add_order(id, email, total) {
+    const ordersRef = database.ref('orders');
+    console.log('Adding order: ', id, email, total)
+    ordersRef.child(id).set({
+        id: id,
+        status: 'in_cart', //default status
+        total: total,
+        user_email: email
+    }, (error) => {
         if (error) {
-            console.error('Ошибка вставки данных:', error);
-            return;
-        }
-        console.log('Данные вставлены успешно');
-    });
-}
-
-export function update_order(id, new_status, new_total, new_email) {
-
-// Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE orders SET status = ?, total = ?, user_email = ? WHERE id = ?';
-
-    connection.query(updateQuery, [new_status, new_total, new_email, id], (error, results) => {
-        if (error) {
-            console.error('Ошибка при обновлении данных:', error);
-            // Обработка ошибки
+            console.error('Error adding order:', error);
         } else {
-            console.log('Данные успешно обновлены!');
-            // Дополнительные действия при успешном обновлении данных
+            console.log('Order added successfully');
         }
     });
 }
 
-export function delete_order(id) {
-    // SQL-запрос для удаления данных
-    const deleteQuery = 'DELETE FROM orders WHERE id = ?';
-
-    // Выполнение SQL-запроса для удаления данных
-    connection.query(deleteQuery, [id], (error, results) => {
+// Update order fields by id
+export function update_order(id, new_status, new_total, new_email) {
+    console.log('Updating order: ', id, new_email, new_total, new_status)
+    const orderRef = database.ref('orders').child(id);
+    orderRef.update({
+        status: new_status,
+        total: new_total,
+        user_email: new_email
+    }, (error) => {
         if (error) {
-            console.error('Ошибка при удалении заказа:', error);
-            return;
+            console.error('Error updating order:', error);
+        } else {
+            console.log('Order updated successfully');
         }
-        console.log('Заказ успешно удален');
     });
 }
 
+// Delete order by id
+export function delete_order(id) {
+    const orderRef = database.ref('orders').child(id);
+    console.log('Deleting order: ', id)
+    orderRef.remove((error) => {
+        if (error) {
+            console.error('Error deleting order:', error);
+        } else {
+            console.log('Order deleted successfully');
+        }
+    });
+}
+
+// Get info about order by id
 export function get_order_by_id(id) {
     return new Promise((resolve, reject) => {
-        // SQL-запрос для получения заказа по ID
-        const selectQuery = 'SELECT * FROM orders WHERE id = ?';
-
-        // Выполнение SQL-запроса для получения заказа
-        connection.query(selectQuery, [id], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении заказа:', error);
-                reject(error);
-                return;
-            }
-
-            // Возвращаем результаты
-            resolve(results[0]);
+        const orderRef = database.ref('orders').child(id);
+        orderRef.once('value', snapshot => {
+            const order = snapshot.val();
+            resolve(order);
+        }, error => {
+            console.error('Error getting order:', error);
+            reject(error);
         });
     });
 }
 
+// Get orders by User Email
 export function get_orders_by_user(email) {
     return new Promise((resolve, reject) => {
-        // SQL-запрос для получения заказов по email пользователя
-        const selectQuery = 'SELECT * FROM orders WHERE user_email = ?';
-
-        // Выполнение SQL-запроса для получения заказов
-        connection.query(selectQuery, [email], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении заказов:', error);
-                reject(error);
-                return;
-            }
-            // Возвращаем результаты
-            resolve(results);
+        console.log('Getting orders by email: ', email)
+        const ordersRef = database.ref('orders');
+        ordersRef.orderByChild('user_email').equalTo(email).once('value', snapshot => {
+            const orders = snapshot.val();
+            resolve(Object.values(orders));
+        }, error => {
+            console.error('Error getting orders:', error);
+            reject(error);
         });
     });
 }
 
-export function get_products_in_cart(username) {
-    return new Promise((resolve, reject) => {
-        const selectQuery = `
-            SELECT order_items.*, products.*
-            FROM order_items
-            JOIN orders ON order_items.order_id = orders.id
-            JOIN products ON order_items.product_id = products.id
-            JOIN users ON orders.user_email = users.email
-            WHERE users.username = ? AND orders.status = 'in_cart'
-        `;
-
-        connection.query(selectQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении элементов заказа в корзине:', error);
-                reject(error);
-                return;
-            }
-
-            resolve(results);
-        });
-    });
-}
-
-export function get_order_items_in_cart(username) {
-    return new Promise((resolve, reject) => {
-        const selectQuery = `
-            SELECT order_items.id AS order_item_id, order_items.count, products.*
-            FROM order_items
-            JOIN orders ON order_items.order_id = orders.id
-            JOIN products ON order_items.product_id = products.id
-            JOIN users ON orders.user_email = users.email
-            WHERE users.username = ? AND orders.status = 'in_cart'
-        `;
-
-        connection.query(selectQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении элементов заказа в корзине:', error);
-                reject(error);
-                return;
-            }
-
-            resolve(results);
-        });
-    });
-}
-
-
-
-export function add_product_to_cart(username, product_id, count) {
-    return new Promise((resolve, reject) => {
-        // Get the user's email based on the username
-        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
-
-        connection.query(getUserEmailQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении email пользователя:', error);
-                reject(error);
-                return;
-            }
-
-            if (results.length === 0) {
-                console.error('Пользователь не найден');
-                reject('Пользователь не найден');
-                return;
-            }
-
-            const user_email = results[0].email;
-
-            // Check if there is an open cart for the user
-            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
-
-            connection.query(getOpenCartQuery, [user_email], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при проверке открытой корзины:', error);
-                    reject(error);
-                    return;
-                }
-
-                let order_id;
-
-                if (results.length === 0) {
-                    // If no open cart exists, create a new cart for the user
-                    const getLastOrderIdQuery = 'SELECT MAX(id) AS last_id FROM orders';
-                    connection.query(getLastOrderIdQuery, (error, results) => {
-                        if (error) {
-                            console.error('Ошибка при получении последнего ID заказа:', error);
-                            reject(error);
-                            return;
-                        }
-
-                        order_id = results[0].last_id + 1;
-
-                        // Check the last id in order_items table as well
-                        const getLastOrderItemIdQuery = 'SELECT MAX(id) AS last_order_item_id FROM order_items';
-                        connection.query(getLastOrderItemIdQuery, (error, results) => {
-                            if (error) {
-                                console.error('Ошибка при получении последнего ID элемента заказа:', error);
-                                reject(error);
-                                return;
-                            }
-
-                            const order_item_id = results[0].last_order_item_id + 1;
-
-                            const createCartQuery = 'INSERT INTO orders (id, status, user_email) VALUES (?, "in_cart", ?)';
-                            connection.query(createCartQuery, [order_id, user_email], (error) => {
-                                if (error) {
-                                    console.error('Ошибка при создании новой корзины:', error);
-                                    reject(error);
-                                    return;
-                                }
-
-                                addOrderItem(order_item_id, order_id, product_id, count);
-                                resolve('Товар успешно добавлен в корзину');
-                            });
-                        });
-                    });
-                } else {
-                    // Use the existing open cart for the user
-                    order_id = results[0].id;
-
-                    // Check the last id in order_items table as well
-                    const getLastOrderItemIdQuery = 'SELECT MAX(id) AS last_order_item_id FROM order_items';
-                    connection.query(getLastOrderItemIdQuery, (error, results) => {
-                        if (error) {
-                            console.error('Ошибка при получении последнего ID элемента заказа:', error);
-                            reject(error);
-                            return;
-                        }
-
-                        const order_item_id = results[0].last_order_item_id + 1;
-                        addOrderItem(order_item_id, order_id, product_id, count);
-                        resolve('Товар успешно добавлен в корзину');
-                    });
-                }
-            });
-        });
-    });
-}
-
-
-
-
-function addOrderItem(id, order_id, product_id, count) {
-    const insertQuery = 'INSERT INTO order_items (id, order_id, product_id, count) VALUES (?, ?, ?, ?)';
-
-    connection.query(insertQuery, [id, order_id, product_id, count], (error) => {
-        if (error) {
-            console.error('Ошибка при добавлении элемента заказа:', error);
-        }
-    });
-}
-
-export function remove_product_from_cart(username, product_id) {
-    return new Promise((resolve, reject) => {
-        // Get the user's email based on the username
-        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
-
-        connection.query(getUserEmailQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении email пользователя:', error);
-                reject(error);
-                return;
-            }
-
-            if (results.length === 0) {
-                console.error('Пользователь не найден');
-                reject('Пользователь не найден');
-                return;
-            }
-
-            const user_email = results[0].email;
-
-            // Get the open cart for the user
-            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
-
-            connection.query(getOpenCartQuery, [user_email], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении открытой корзины:', error);
-                    reject(error);
-                    return;
-                }
-
-                if (results.length === 0) {
-                    console.error('Открытая корзина не найдена');
-                    reject('Открытая корзина не найдена');
-                    return;
-                }
-
-                const order_id = results[0].id;
-                removeOrderItem(order_id, product_id);
-
-                resolve('Товар успешно удален из корзины');
-            });
-        });
-    });
-}
-
-function removeOrderItem(order_id, product_id) {
-    const deleteQuery = 'DELETE FROM order_items WHERE order_id = ? AND product_id = ?';
-
-    connection.query(deleteQuery, [order_id, product_id], (error) => {
-        if (error) {
-            console.error('Ошибка при удалении элемента заказа:', error);
-        }
-    });
-}
-
-export function update_product_count_in_cart(username, product_id, new_count) {
-    return new Promise((resolve, reject) => {
-        // Get the user's email based on the username
-        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
-
-        connection.query(getUserEmailQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении email пользователя:', error);
-                reject(error);
-                return;
-            }
-
-            if (results.length === 0) {
-                console.error('Пользователь не найден');
-                reject('Пользователь не найден');
-                return;
-            }
-
-            const user_email = results[0].email;
-
-            // Get the open cart for the user
-            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
-
-            connection.query(getOpenCartQuery, [user_email], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении открытой корзины:', error);
-                    reject(error);
-                    return;
-                }
-
-                if (results.length === 0) {
-                    console.error('Открытая корзина не найдена');
-                    reject('Открытая корзина не найдена');
-                    return;
-                }
-
-                const order_id = results[0].id;
-                updateOrderItemQuantity(order_id, product_id, new_count);
-
-                resolve('Количество товара в корзине успешно обновлено');
-            });
-        });
-    });
-}
-
-export function updateOrderItemCount(id, new_count) {
-    const updateQuery = 'UPDATE order_items SET count = ? WHERE id = ?';
-
-    connection.query(updateQuery, [new_count, id], (error) => {
-        if (error) {
-            console.error('Ошибка при обновлении количества товара в корзине:', error);
-        }
-    });
-}
-
-export function update_cart_status_to_in_progress(username) {
-    return new Promise((resolve, reject) => {
-        // Get the user's email based on the username
-        const getUserEmailQuery = 'SELECT email FROM users WHERE username = ?';
-
-        connection.query(getUserEmailQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении email пользователя:', error);
-                reject(error);
-                return;
-            }
-
-            if (results.length === 0) {
-                console.error('Пользователь не найден');
-                reject('Пользователь не найден');
-                return;
-            }
-
-            const user_email = results[0].email;
-
-            // Get the open cart for the user
-            const getOpenCartQuery = 'SELECT * FROM orders WHERE user_email = ? AND status = "in_cart"';
-
-            connection.query(getOpenCartQuery, [user_email], (error, results) => {
-                if (error) {
-                    console.error('Ошибка при получении открытой корзины:', error);
-                    reject(error);
-                    return;
-                }
-
-                if (results.length === 0) {
-                    console.error('Открытая корзина не найдена');
-                    reject('Открытая корзина не найдена');
-                    return;
-                }
-
-                const order_id = results[0].id;
-                updateOrderStatus(order_id, 'in_progress');
-
-                resolve('Статус заказа успешно изменен на "в обработке"');
-            });
-        });
-    });
-}
-
-export function updateOrderStatus(order_id, new_status) {
-    const updateQuery = 'UPDATE orders SET status = ? WHERE id = ?';
-
-    connection.query(updateQuery, [new_status, order_id], (error) => {
-        if (error) {
-            console.error('Ошибка при обновлении статуса заказа:', error);
-        }
-    });
-}
-
-export async function isProductInCart(username, product_id) {
-    try {
-        var answer = false;
-        console.log(product_id)
-        const cartItems = await get_products_in_cart(username);
-        cartItems.forEach(item => {
-            if (item.product_id == product_id) {
-                answer = true;
-            }
-        });
-        return answer;
-    } catch (error) {
-        console.error('Error checking if the product is in the cart:', error);
-        return false;
-    }
-}
-
-export async function get_user_orders(username) {
+// Get products in cart by username
+export async function get_products_in_cart(username) {
+    console.log('Getting products in cart: ', username)
     try {
         const user = await get_user_by_username(username);
 
@@ -451,95 +107,256 @@ export async function get_user_orders(username) {
             return [];
         }
 
-        const orders = await get_orders_by_user(user.email);
+        const ordersSnapshot = await database.ref('orders')
+            .orderByChild('user_email')
+            .equalTo(user.email)
+            .once('value');
 
-        // Filter out orders with status 'in_cart'
-        const filteredOrders = orders.filter(order => order.status !== 'in_cart');
+        const orders = ordersSnapshot.val();
 
-        const userOrders = await Promise.all(
-            filteredOrders.map(async (order) => {
-                const orderItems = await get_order_items_by_order_id(order.id);
-                const products = await Promise.all(
-                    orderItems.map(async (item) => {
-                        const product = await get_product_by_id(item.product_id);
-                        const totalPrice = product.price * item.count;
-                        return {
-                            artist: product.artist,
-                            album: product.album,
-                            count: item.count,
-                            price: product.price,
-                            totalPrice: totalPrice, // Total price without decimal places (whole number)
-                        };
-                    })
-                );
+        const cartOrders = Object.values(orders).filter(order => order.status === 'in_cart');
 
-                // Calculate the total for this order
-                const total = products.reduce((acc, product) => acc + product.totalPrice, 0);
+        const productsPromises = cartOrders.map(async order => {
+            const orderItemsSnapshot = await database.ref('order_items')
+                .orderByChild('order_id')
+                .equalTo(order.id)
+                .once('value');
 
+            const orderItems = orderItemsSnapshot.val();
+            const productPromises = Object.values(orderItems).map(async orderItem => {
+                const product = await get_product_by_id(orderItem.product_id);
                 return {
-                    products,
-                    status: order.status,
-                    total: total, // Total without decimal places (whole number)
+                    ...orderItem,
+                    product
                 };
-            })
-        );
+            });
+            return Promise.all(productPromises);
+        });
 
-        return userOrders;
+        const products = await Promise.all(productsPromises);
+        return products.flat();
+    } catch (error) {
+        console.error('Error getting products in cart:', error);
+        return [];
+    }
+}
+
+// Add product to user's cart
+export async function add_product_to_cart(username, product_id, count) {
+    console.log('Adding product to cart: ', username, product_id, 'count: ', count)
+    try {
+        const user = await get_user_by_username(username);
+        if (!user) {
+            console.error('User not found');
+            return 'User not found';
+        }
+
+        const userOrdersData = await database.ref('orders')
+            .orderByChild('user_email')
+            .equalTo(user.email)
+            .once('value');
+
+        const userOrders = userOrdersData.val();
+        let openCartOrders;
+        if (!userOrders)
+            openCartOrders = []
+        else
+            openCartOrders = Object.values(userOrders).filter(order => order.status === 'in_cart');
+        let order_id;
+        if (openCartOrders.length !== 1) {
+            // New order for cart
+            const ordersSnapshot = await database.ref('orders').once('value');
+            const orders = ordersSnapshot.val();
+
+            if (!orders) {
+                order_id = 1;
+            } else {
+                const orderIds = Object.keys(orders).map(id => parseInt(id));
+                order_id = Math.max(...orderIds, 0) + 1;
+            }
+            console.log(order_id)
+
+            const newOrderRef = database.ref('orders').child(order_id);
+            add_order(order_id, user.email, 0)
+        } else {
+            // Cart is already exist
+            order_id = openCartOrders[0].id;
+        }
+        const orderItemRef = database.ref('order_items');
+        const orderItemIdSnapshot = await orderItemRef.once('value');
+        const orderItemIds = orderItemIdSnapshot.exists() ? Object.keys(orderItemIdSnapshot.val()).map(id => parseInt(id)) : [];
+        const order_item_id = Math.max(...orderItemIds, 0) + 1;
+        add_order_item(order_item_id, order_id, product_id, count)
+
+        return 'Product successfully added to cart';
+    } catch (error) {
+        console.error('Error adding product to cart:', error);
+        return 'Error adding product to cart';
+    }
+}
+
+
+export async function remove_product_from_cart(username, product_id) {
+    try {
+        const user = await get_user_by_username(username);
+        if (!user) {
+            console.error('User not found');
+            return 'User not found';
+        }
+
+        const openCartOrdersSnapshot = await database.ref('orders')
+            .orderByChild('user_email')
+            .equalTo(user.email)
+            .orderByChild('status')
+            .equalTo('in_cart')
+            .once('value');
+
+        const openCartOrders = openCartOrdersSnapshot.val();
+
+        if (!openCartOrders) {
+            console.error('Open cart not found');
+            return 'Open cart not found';
+        }
+
+        const order_id = Object.keys(openCartOrders)[0];
+
+        const orderItemRef = database.ref('order_items');
+        const orderItemsSnapshot = await orderItemRef
+            .orderByChild('order_id')
+            .equalTo(order_id)
+            .orderByChild('product_id')
+            .equalTo(product_id)
+            .once('value');
+
+        const orderItems = orderItemsSnapshot.val();
+        if (!orderItems) {
+            console.error('Product not found in cart');
+            return 'Product not found in cart';
+        }
+
+        const orderItemIds = Object.keys(orderItems);
+        await Promise.all(orderItemIds.map(id => orderItemRef.child(id).remove()));
+
+        return 'Product successfully removed from cart';
+    } catch (error) {
+        console.error('Error removing product from cart:', error);
+        return 'Error removing product from cart';
+    }
+}
+
+export async function update_product_count_in_cart(username, product_id, new_count) {
+    try {
+        const user = await get_user_by_username(username);
+        if (!user) {
+            console.error('User not found');
+            return 'User not found';
+        }
+
+        const openCartOrdersSnapshot = await database.ref('orders')
+            .orderByChild('user_email')
+            .equalTo(user.email)
+            .orderByChild('status')
+            .equalTo('in_cart')
+            .once('value');
+
+        const openCartOrders = openCartOrdersSnapshot.val();
+
+        if (!openCartOrders) {
+            console.error('Open cart not found');
+            return 'Open cart not found';
+        }
+
+        const order_id = Object.keys(openCartOrders)[0];
+
+        const orderItemRef = database.ref('order_items');
+        const orderItemsSnapshot = await orderItemRef
+            .orderByChild('order_id')
+            .equalTo(order_id)
+            .orderByChild('product_id')
+            .equalTo(product_id)
+            .once('value');
+
+        const orderItems = orderItemsSnapshot.val();
+        if (!orderItems) {
+            console.error('Product not found in cart');
+            return 'Product not found in cart';
+        }
+
+        const orderItemIds = Object.keys(orderItems);
+        await Promise.all(orderItemIds.map(id => orderItemRef.child(id).update({ count: new_count })));
+
+        return 'Product count in cart successfully updated';
+    } catch (error) {
+        console.error('Error updating product count in cart:', error);
+        return 'Error updating product count in cart';
+    }
+}
+
+export async function update_cart_status_to_in_progress(username) {
+    try {
+        const user = await get_user_by_username(username);
+        if (!user) {
+            console.error('User not found');
+            return 'User not found';
+        }
+        const ordersId = await get_orders_by_user(user.email);
+        const cartOrders = Object.values(ordersId).filter(order => order.status === 'in_cart');
+        await updateOrderStatus(cartOrders[0].id, 'in_progress')
+        return 'Cart status successfully updated to "in_progress"';
+    } catch (error) {
+        console.error('Error updating cart status to in_progress:', error);
+        return 'Error updating cart status to in_progress';
+    }
+}
+
+export async function get_user_orders(username) {
+    try {
+        const user = await get_user_by_username(username);
+        const ordersIds = await get_orders_by_user(user.email)
+        console.log('ids:', ordersIds)
     } catch (error) {
         console.error('Error getting user orders:', error);
         return [];
     }
 }
 
-export async function get_orders_by_status(status) {
-    return new Promise((resolve, reject) => {
-        // SQL query to get orders by status
-        const selectQuery = 'SELECT * FROM orders WHERE status = ?';
-
-        // Execute SQL query to get orders by status
-        connection.query(selectQuery, [status], (error, results) => {
-            if (error) {
-                console.error('Error fetching orders by status:', error);
-                reject(error);
-                return;
-            }
-
-            // Return the retrieved orders
-            resolve(results);
-        });
-    });
-}
-
 export async function get_in_progress_orders() {
     try {
-        const orders = await get_orders_by_status('in_progress');
+        const ordersSnapshot = await database.ref('orders')
+            .orderByChild('status')
+            .equalTo('in_progress')
+            .once('value');
+
+        const orders = ordersSnapshot.val();
 
         const inProgressOrders = await Promise.all(
-            orders.map(async (order) => {
-                const orderItems = await get_order_items_by_order_id(order.id);
-                const products = await Promise.all(
-                    orderItems.map(async (item) => {
-                        const product = await get_product_by_id(item.product_id);
-                        const totalPrice = product.price * item.count;
-                        return {
-                            artist: product.artist,
-                            album: product.album,
-                            count: item.count,
-                            price: product.price,
-                            totalPrice: totalPrice, // Total price without decimal places (whole number)
-                        };
-                    })
-                );
+            Object.values(orders).map(async (order) => {
+                const orderItemsSnapshot = await database.ref('order_items')
+                    .orderByChild('order_id')
+                    .equalTo(order.id)
+                    .once('value');
 
-                // Calculate the total for this order
-                const total = products.reduce((acc, product) => acc + product.totalPrice, 0);
+                const orderItems = orderItemsSnapshot.val();
+                const productPromises = Object.values(orderItems).map(async (orderItem) => {
+                    const product = await get_product_by_id(orderItem.product_id);
+                    return {
+                        ...orderItem,
+                        product
+                    };
+                });
+
+                const products = await Promise.all(productPromises);
+
+                const total = products.reduce((acc, orderItem) => {
+                    return acc + (orderItem.product.price * orderItem.count);
+                }, 0);
 
                 return {
                     order_id: order.id,
                     email: order.user_email,
                     products,
                     status: order.status,
-                    total: total, // Total without decimal places (whole number)
+                    total: total,
                 };
             })
         );
@@ -552,20 +369,100 @@ export async function get_in_progress_orders() {
 }
 
 
-/*
-get_order_by_id(1).then((order) => {
-    console.log(order); // Log the retrieved order by ID
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
+export async function isProductInCart(username, product_id) {
+    try {
+        const orderItems = await get_order_items_in_cart(username);
+        const products = orderItems.map(orderItem => orderItem.id)
+        console.log(products)
+        return products.includes(product_id)
+    } catch (error) {
+        console.error('Error checking if the product is in the cart:', error);
+        return false;
+    }
+}
 
-get_orders_by_user('test@test.test').then((orders) => {
-    console.log(orders); // Log the retrieved orders by user email
-}).catch((error) => {
-    console.error(error); // Handle any errors
-}); */
-/*get_in_progress_orders().then((results) => {
-    console.log(results); // Log the retrieved orders in cart and associated products by username
-}).catch((error) => {
-    console.error(error); // Handle any errors
-})*/
+
+export async function get_orders_by_status(status) {
+    try {
+        const ordersSnapshot = await database.ref('orders')
+            .orderByChild('status')
+            .equalTo(status)
+            .once('value');
+
+        const orders = ordersSnapshot.val();
+
+        return Object.values(orders);
+    } catch (error) {
+        console.error('Error fetching orders by status:', error);
+        return [];
+    }
+}
+
+
+export async function get_order_items_in_cart(username) {
+    try {
+        const user = await get_user_by_username(username);
+
+        if (!user) {
+            console.error('User not found');
+            return [];
+        }
+
+        const openCartOrdersSnapshot = await database.ref('orders')
+            .orderByChild('user_email')
+            .equalTo(user.email)
+            .once('value');
+
+        const openCartOrders = openCartOrdersSnapshot.val();
+
+        if (!openCartOrders) {
+            console.error('Open cart not found');
+            return [];
+        }
+        const cartOrders = Object.values(openCartOrders).filter(order => order.status === 'in_cart');
+        const order_id = cartOrders[0].id;
+        const orderItemRef = database.ref('order_items');
+        const orderItemsSnapshot = await orderItemRef
+            .orderByChild('order_id')
+            .equalTo(order_id)
+            .once('value');
+
+        const orderItems = orderItemsSnapshot.val();
+
+        const productsSnapshot = await database.ref('products').once('value');
+        const products = productsSnapshot.val();
+
+        return Object.values(orderItems).map(orderItem => {
+            const product = products[orderItem.product_id];
+            const totalPrice = product.price * orderItem.count;
+            return {
+                order_item_id: orderItem.id,
+                count: orderItem.count,
+                ...product,
+                totalPrice: totalPrice, // Total price without decimal places (whole number)
+            };
+        });
+    } catch (error) {
+        console.error('Error getting order items in cart:', error);
+        return [];
+    }
+}
+export function updateOrderItemCount(order_item_id, new_count) {
+    try {
+        const orderItemRef = database.ref('order_items').child(order_item_id);
+        orderItemRef.update({ count: new_count });
+        console.log('Order item count updated successfully');
+    } catch (error) {
+        console.error('Error updating order item count:', error);
+    }
+}
+
+export function updateOrderStatus(order_id, new_status) {
+    try {
+        const orderRef = database.ref('orders').child(order_id);
+        orderRef.update({ status: new_status });
+        console.log('Order status updated successfully');
+    } catch (error) {
+        console.error('Error updating order status:', error);
+    }
+}

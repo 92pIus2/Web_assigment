@@ -1,183 +1,134 @@
-import mysql from 'mysql'
 
+import firebase from "firebase/compat/app";
+import {} from "firebase/compat/database";
 
-const connection = mysql.createConnection({
-    host: 'sql7.freesqldatabase.com',
-    user: 'sql7634155',
-    password: 'twVQVPvpFA',
-    database: 'sql7634155'
-});
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAORF8cH1QIAuYICrYMtgAwb5UCz4OKgxQ",
+    authDomain: "webvinyl-4912c.firebaseapp.com",
+    databaseURL: "https://webvinyl-4912c-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "webvinyl-4912c",
+    storageBucket: "webvinyl-4912c.appspot.com",
+    messagingSenderId: "1017529934891",
+    appId: "1:1017529934891:web:7d3448757b9bc14376b66e",
+    measurementId: "G-KDPE4VBBJM"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-connection.connect((error) => {
-    if (error) {
-        console.error('Ошибка подключения к базе данных:', error);
-        return;
-    }
-    console.log('Подключено к базе данных MySQL');
-});
+// Add a user to Firebase
 export function add_user(email, username, password) {
-    //email
-    //username
-    //password
+    const usersRef = database.ref('users');
 
-    // SQL-запрос для вставки данных
-    const insertQuery = `
-        INSERT INTO users (email, username, password)
-        VALUES (?, ?, ?)
-    `;
-    const values = [email, username, password];
-
-    // Выполнение SQL-запроса для вставки данных
-    connection.query(insertQuery, values, (error) => {
+    usersRef.push({
+        email: email,
+        username: username,
+        password: password
+    }, (error) => {
         if (error) {
-            console.error('Ошибка вставки данных:', error);
-            return;
+            console.error('Error adding user:', error);
+        } else {
+            console.log('User added successfully');
         }
-        console.log('Данные вставлены успешно');
     });
 }
+
+// Update user by username in Firebase
 export function update_user_by_username(username, new_username, new_password) {
+    const usersRef = database.ref('users');
 
-// Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE users SET password = ?, username = ? WHERE username = ?';
-
-    connection.query(updateQuery, [new_password, new_username, username], (error, results) => {
-        if (error) {
-            console.error('Ошибка при обновлении данных:', error);
-            // Обработка ошибки
-        } else {
-            console.log('Данные успешно обновлены!');
-            // Дополнительные действия при успешном обновлении данных
-        }
-    });
-}
-
-export function update_user_by_email(email, new_email, new_password) {
-
-// Выполняем SQL-запрос для обновления данных
-    const updateQuery = 'UPDATE users SET email = ?, password = ? WHERE email = ?';
-
-    connection.query(updateQuery, [new_email, new_password, email], (error, results) => {
-        if (error) {
-            console.error('Ошибка при обновлении данных:', error);
-            // Обработка ошибки
-        } else {
-            console.log('Данные успешно обновлены!');
-            // Дополнительные действия при успешном обновлении данных
-        }
-    });
-}
-
-export function delete_user(identifier) {
-    // Check if the identifier is an email or username
-    const isEmail = identifier.includes('@');
-    let deleteQuery, values;
-
-    if (isEmail) {
-        // Delete user by email
-        deleteQuery = 'DELETE FROM users WHERE email = ?';
-        values = [identifier];
-    } else {
-        // Delete user by username
-        deleteQuery = 'DELETE FROM users WHERE username = ?';
-        values = [identifier];
-    }
-
-    // Execute the delete query
-    connection.query(deleteQuery, values, (error) => {
-        if (error) {
-            console.error('Ошибка при удалении пользователя:', error);
-            return;
-        }
-        console.log('Пользователь успешно удален');
-    });
-}
-
-export function checkPassword(username, password) {
-    return new Promise((resolve, reject) => {
-        // SQL-запрос для выборки пользователя по имени пользователя (username)
-        const selectQuery = `
-            SELECT * FROM users WHERE username = ?
-        `;
-        const values = [username];
-
-        // Выполнение SQL-запроса для выборки пользователя
-        connection.query(selectQuery, values, (error, results) => {
-            if (error) {
-                console.error('Ошибка выборки данных:', error);
-                connection.end();
-                reject(error);
-                return;
-            }
-
-            // Проверка пароля
-            if (results.length === 0) {
-                // Пользователь не найден
-                resolve(false);
-            } else {
-                // Пользователь найден, сравниваем пароли
-                const user = results[0];
-                if (user.password === password) {
-                    console.log('Пароль верный')
-                    resolve(true); // Пароль совпадает
-
+    usersRef.orderByChild('username').equalTo(username).once('value', snapshot => {
+        snapshot.forEach(userSnapshot => {
+            userSnapshot.ref.update({
+                username: new_username,
+                password: new_password
+            }, (error) => {
+                if (error) {
+                    console.error('Error updating user:', error);
                 } else {
-                    console.log('Пароль неверный')
-                    resolve(false); // Пароль не совпадает
+                    console.log('User updated successfully');
                 }
-            }
+            });
         });
     });
 }
 
-export function get_user_by_email(email) {
-    return new Promise((resolve, reject) => {
-        // SQL-запрос для получения пользователя по email
-        const selectQuery = 'SELECT * FROM users WHERE email = ?';
+// Delete user by username or email from Firebase
+export function delete_user(identifier) {
+    const usersRef = database.ref('users');
+    const isEmail = identifier.includes('@');
 
-        // Выполнение SQL-запроса для получения пользователя
-        connection.query(selectQuery, [email], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении пользователя:', error);
-                reject(error);
-                return;
-            }
-
-            // Возвращаем результаты
-            resolve(results[0]);
+    usersRef.orderByChild(isEmail ? 'email' : 'username').equalTo(identifier).once('value', snapshot => {
+        snapshot.forEach(userSnapshot => {
+            userSnapshot.ref.remove((error) => {
+                if (error) {
+                    console.error('Error deleting user:', error);
+                } else {
+                    console.log('User deleted successfully');
+                }
+            });
         });
     });
 }
 
+// Retrieve user by username from Firebase
 export function get_user_by_username(username) {
     return new Promise((resolve, reject) => {
-        // SQL-запрос для получения пользователя по username
-        const selectQuery = 'SELECT * FROM users WHERE username = ?';
+        const usersRef = database.ref('users');
 
-        // Выполнение SQL-запроса для получения пользователя
-        connection.query(selectQuery, [username], (error, results) => {
-            if (error) {
-                console.error('Ошибка при получении пользователя:', error);
-                reject(error);
-                return;
+        usersRef.orderByChild('username').equalTo(username).once('value', snapshot => {
+            const user = snapshot.val();
+            if (user) {
+                resolve(Object.values(user)[0]);
+            } else {
+                resolve(null);
             }
-
-            // Возвращаем результаты
-            resolve(results[0]);
+        }, error => {
+            console.error('Error getting user:', error);
+            reject(error);
         });
     });
 }
 
-/*
-get_user_by_email('test@test.test').then((user) => {
-    console.log(user); // Log the retrieved user by email
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
+// Retrieve user by email from Firebase
+export function get_user_by_email(email) {
+    return new Promise((resolve, reject) => {
+        const usersRef = database.ref('users');
 
-get_user_by_username('admin').then((user) => {
-    console.log(user); // Log the retrieved user by username
-}).catch((error) => {
-    console.error(error); // Handle any errors
-});
-*/
+        usersRef.orderByChild('email').equalTo(email).once('value', snapshot => {
+            const user = snapshot.val();
+            if (user) {
+                resolve(Object.values(user)[0]);
+            } else {
+                resolve(null);
+            }
+        }, error => {
+            console.error('Error getting user:', error);
+            reject(error);
+        });
+    });
+}
+
+// Check if the provided password matches the stored password for the given username
+export function checkPassword(username, password) {
+    return new Promise((resolve, reject) => {
+        const usersRef = database.ref('users');
+
+        usersRef.orderByChild('username').equalTo(username).once('value', snapshot => {
+            const user = snapshot.val();
+            if (user) {
+                const userData = Object.values(user)[0];
+                if (userData.password === password) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            } else {
+                resolve(false);
+            }
+        }, error => {
+            console.error('Error checking password:', error);
+            reject(error);
+        });
+    });
+}
