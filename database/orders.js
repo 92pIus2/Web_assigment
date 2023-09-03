@@ -1,28 +1,15 @@
-import { get_user_by_username } from "./users.js";
-import { get_product_by_id } from "./products.js";
+import {create} from "./create.js";
+import {get_user_by_username} from "./users.js";
+import {get_product_by_id} from "./products.js";
 import {add_order_item, get_order_items_by_order_id} from "./order_items.js";
 
-import firebase from "firebase/compat/app";
-import {} from "firebase/compat/database";
-
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyAORF8cH1QIAuYICrYMtgAwb5UCz4OKgxQ",
-    authDomain: "webvinyl-4912c.firebaseapp.com",
-    databaseURL: "https://webvinyl-4912c-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "webvinyl-4912c",
-    storageBucket: "webvinyl-4912c.appspot.com",
-    messagingSenderId: "1017529934891",
-    appId: "1:1017529934891:web:7d3448757b9bc14376b66e",
-    measurementId: "G-KDPE4VBBJM"
-};
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+const database = create();
 
 // Add order to database
 export function add_order(id, email, total) {
-    const ordersRef = database.ref('orders');
     console.log('Adding order: ', id, email, total)
+
+    const ordersRef = database.ref('orders');
     ordersRef.child(id).set({
         id: id,
         status: 'in_cart', //default status
@@ -37,54 +24,11 @@ export function add_order(id, email, total) {
     });
 }
 
-// Update order fields by id
-export function update_order(id, new_status, new_total, new_email) {
-    console.log('Updating order: ', id, new_email, new_total, new_status)
-    const orderRef = database.ref('orders').child(id);
-    orderRef.update({
-        status: new_status,
-        total: new_total,
-        user_email: new_email
-    }, (error) => {
-        if (error) {
-            console.error('Error updating order:', error);
-        } else {
-            console.log('Order updated successfully');
-        }
-    });
-}
-
-// Delete order by id
-export function delete_order(id) {
-    const orderRef = database.ref('orders').child(id);
-    console.log('Deleting order: ', id)
-    orderRef.remove((error) => {
-        if (error) {
-            console.error('Error deleting order:', error);
-        } else {
-            console.log('Order deleted successfully');
-        }
-    });
-}
-
-// Get info about order by id
-export function get_order_by_id(id) {
-    return new Promise((resolve, reject) => {
-        const orderRef = database.ref('orders').child(id);
-        orderRef.once('value', snapshot => {
-            const order = snapshot.val();
-            resolve(order);
-        }, error => {
-            console.error('Error getting order:', error);
-            reject(error);
-        });
-    });
-}
-
 // Get orders by User Email
 export function get_orders_by_user(email) {
+    console.log('Getting orders by email: ', email)
+
     return new Promise((resolve, reject) => {
-        console.log('Getting orders by email: ', email)
         const ordersRef = database.ref('orders');
         ordersRef.orderByChild('user_email').equalTo(email).once('value', snapshot => {
             const orders = snapshot.val();
@@ -96,54 +40,10 @@ export function get_orders_by_user(email) {
     });
 }
 
-// Get products in cart by username
-export async function get_products_in_cart(username) {
-    console.log('Getting products in cart: ', username)
-    try {
-        const user = await get_user_by_username(username);
-
-        if (!user) {
-            console.error('User not found');
-            return [];
-        }
-
-        const ordersSnapshot = await database.ref('orders')
-            .orderByChild('user_email')
-            .equalTo(user.email)
-            .once('value');
-
-        const orders = ordersSnapshot.val();
-
-        const cartOrders = Object.values(orders).filter(order => order.status === 'in_cart');
-
-        const productsPromises = cartOrders.map(async order => {
-            const orderItemsSnapshot = await database.ref('order_items')
-                .orderByChild('order_id')
-                .equalTo(order.id)
-                .once('value');
-
-            const orderItems = orderItemsSnapshot.val();
-            const productPromises = Object.values(orderItems).map(async orderItem => {
-                const product = await get_product_by_id(orderItem.product_id);
-                return {
-                    ...orderItem,
-                    product
-                };
-            });
-            return Promise.all(productPromises);
-        });
-
-        const products = await Promise.all(productsPromises);
-        return products.flat();
-    } catch (error) {
-        console.error('Error getting products in cart:', error);
-        return [];
-    }
-}
-
 // Add product to user's cart
 export async function add_product_to_cart(username, product_id, count) {
     console.log('Adding product to cart: ', username, product_id, 'count: ', count)
+
     try {
         const user = await get_user_by_username(username);
         if (!user) {
@@ -162,31 +62,30 @@ export async function add_product_to_cart(username, product_id, count) {
             openCartOrders = []
         else
             openCartOrders = Object.values(userOrders).filter(order => order.status === 'in_cart');
-        let order_id;
+        let order_id; // id for order
         if (openCartOrders.length !== 1) {
             // New order for cart
             const ordersSnapshot = await database.ref('orders').once('value');
             const orders = ordersSnapshot.val();
 
             if (!orders) {
-                order_id = 1;
+                order_id = 1; // for the first order
             } else {
                 const orderIds = Object.keys(orders).map(id => parseInt(id));
-                order_id = Math.max(...orderIds, 0) + 1;
+                order_id = Math.max(...orderIds, 0) + 1; // new ID for a new order
             }
-            console.log(order_id)
-
-            const newOrderRef = database.ref('orders').child(order_id);
+            console.log("New order: ", order_id)
             add_order(order_id, user.email, 0)
         } else {
             // Cart is already exist
-            order_id = openCartOrders[0].id;
+            order_id = openCartOrders[0].id; // current ID
+            console.log("Cart is exist: ", order_id)
         }
         const orderItemRef = database.ref('order_items');
         const orderItemIdSnapshot = await orderItemRef.once('value');
         const orderItemIds = orderItemIdSnapshot.exists() ? Object.keys(orderItemIdSnapshot.val()).map(id => parseInt(id)) : [];
-        const order_item_id = Math.max(...orderItemIds, 0) + 1;
-        add_order_item(order_item_id, order_id, product_id, count)
+        const order_item_id = Math.max(...orderItemIds, 0) + 1; // New order_item ID
+        add_order_item(order_item_id, order_id, product_id, count) // Create new order_item
 
         return 'Product successfully added to cart';
     } catch (error) {
@@ -195,104 +94,10 @@ export async function add_product_to_cart(username, product_id, count) {
     }
 }
 
-
-export async function remove_product_from_cart(username, product_id) {
-    try {
-        const user = await get_user_by_username(username);
-        if (!user) {
-            console.error('User not found');
-            return 'User not found';
-        }
-
-        const openCartOrdersSnapshot = await database.ref('orders')
-            .orderByChild('user_email')
-            .equalTo(user.email)
-            .orderByChild('status')
-            .equalTo('in_cart')
-            .once('value');
-
-        const openCartOrders = openCartOrdersSnapshot.val();
-
-        if (!openCartOrders) {
-            console.error('Open cart not found');
-            return 'Open cart not found';
-        }
-
-        const order_id = Object.keys(openCartOrders)[0];
-
-        const orderItemRef = database.ref('order_items');
-        const orderItemsSnapshot = await orderItemRef
-            .orderByChild('order_id')
-            .equalTo(order_id)
-            .orderByChild('product_id')
-            .equalTo(product_id)
-            .once('value');
-
-        const orderItems = orderItemsSnapshot.val();
-        if (!orderItems) {
-            console.error('Product not found in cart');
-            return 'Product not found in cart';
-        }
-
-        const orderItemIds = Object.keys(orderItems);
-        await Promise.all(orderItemIds.map(id => orderItemRef.child(id).remove()));
-
-        return 'Product successfully removed from cart';
-    } catch (error) {
-        console.error('Error removing product from cart:', error);
-        return 'Error removing product from cart';
-    }
-}
-
-export async function update_product_count_in_cart(username, product_id, new_count) {
-    try {
-        const user = await get_user_by_username(username);
-        if (!user) {
-            console.error('User not found');
-            return 'User not found';
-        }
-
-        const openCartOrdersSnapshot = await database.ref('orders')
-            .orderByChild('user_email')
-            .equalTo(user.email)
-            .orderByChild('status')
-            .equalTo('in_cart')
-            .once('value');
-
-        const openCartOrders = openCartOrdersSnapshot.val();
-
-        if (!openCartOrders) {
-            console.error('Open cart not found');
-            return 'Open cart not found';
-        }
-
-        const order_id = Object.keys(openCartOrders)[0];
-
-        const orderItemRef = database.ref('order_items');
-        const orderItemsSnapshot = await orderItemRef
-            .orderByChild('order_id')
-            .equalTo(order_id)
-            .orderByChild('product_id')
-            .equalTo(product_id)
-            .once('value');
-
-        const orderItems = orderItemsSnapshot.val();
-        if (!orderItems) {
-            console.error('Product not found in cart');
-            return 'Product not found in cart';
-        }
-
-        const orderItemIds = Object.keys(orderItems);
-        await Promise.all(orderItemIds.map(id => orderItemRef.child(id).update({ count: new_count })));
-
-        return 'Product count in cart successfully updated';
-    } catch (error) {
-        console.error('Error updating product count in cart:', error);
-        return 'Error updating product count in cart';
-    }
-}
-
+//Update order status from 'in_cart' to 'in_progress'
 export async function update_cart_status_to_in_progress(username) {
+    console.log('Updating cart status to in_progress: ', username)
+
     try {
         const user = await get_user_by_username(username);
         if (!user) {
@@ -309,67 +114,90 @@ export async function update_cart_status_to_in_progress(username) {
     }
 }
 
+// Get order history of user
 export async function get_user_orders(username) {
+    console.log('Getting user orders: ', username)
+
     try {
         const user = await get_user_by_username(username);
-        const ordersIds = await get_orders_by_user(user.email)
-        console.log('ids:', ordersIds)
+        const allOrders = await get_orders_by_user(user.email)
+        const orders = Object.values(allOrders).filter(order => order.status != 'in_cart') // Remove cart order
+        const result = []
+        for (let i = 0; i < orders.length; ++i) {
+            const order = orders[i]
+            const orderItems = await get_order_items_by_order_id(order.id)
+            const products = []
+            let total = 0
+            for (let j = 0; j < orderItems.length; ++j) {
+                const orderItem = orderItems[j]
+                const product = await get_product_by_id(orderItem.product_id)
+                const newProduct = {
+                    artist : product.artist,
+                    album : product.album,
+                    count : orderItem.count,
+                    price : product.price
+                }
+                total += product.price * orderItem.count
+                products.push(newProduct)
+            }
+            const newOrder = {
+                status : order.status,
+                total : total,
+                products
+            }
+            result.push(newOrder)
+        }
+        return result;
     } catch (error) {
         console.error('Error getting user orders:', error);
         return [];
     }
 }
 
+// Get orders with 'in_progress' status for Admin
 export async function get_in_progress_orders() {
+    console.log('Getting in_progress orders: ')
+
     try {
-        const ordersSnapshot = await database.ref('orders')
-            .orderByChild('status')
-            .equalTo('in_progress')
-            .once('value');
-
-        const orders = ordersSnapshot.val();
-
-        const inProgressOrders = await Promise.all(
-            Object.values(orders).map(async (order) => {
-                const orderItemsSnapshot = await database.ref('order_items')
-                    .orderByChild('order_id')
-                    .equalTo(order.id)
-                    .once('value');
-
-                const orderItems = orderItemsSnapshot.val();
-                const productPromises = Object.values(orderItems).map(async (orderItem) => {
-                    const product = await get_product_by_id(orderItem.product_id);
-                    return {
-                        ...orderItem,
-                        product
-                    };
-                });
-
-                const products = await Promise.all(productPromises);
-
-                const total = products.reduce((acc, orderItem) => {
-                    return acc + (orderItem.product.price * orderItem.count);
-                }, 0);
-
-                return {
-                    order_id: order.id,
-                    email: order.user_email,
-                    products,
-                    status: order.status,
-                    total: total,
-                };
-            })
-        );
-
-        return inProgressOrders;
+        const orders = await get_orders_by_status('in_progress')
+        const result = []
+        for (let i = 0; i < orders.length; ++i) {
+            const order = orders[i]
+            const orderItems = await get_order_items_by_order_id(order.id)
+            const products = []
+            let total = 0
+            for (let j = 0; j < orderItems.length; ++j) {
+                const orderItem = orderItems[j]
+                const product = await get_product_by_id(orderItem.product_id)
+                const newProduct = {
+                    artist : product.artist,
+                    album : product.album,
+                    count : orderItem.count,
+                    price : product.price
+                }
+                total += product.price * orderItem.count
+                products.push(newProduct)
+            }
+            const newOrder = {
+                order_id : order.id,
+                email : order.user_email,
+                status : order.status,
+                total : total,
+                products
+            }
+            result.push(newOrder)
+        }
+        return result;
     } catch (error) {
         console.error('Error getting in-progress orders:', error);
         return [];
     }
 }
 
-
+// Check is product already in cart
 export async function isProductInCart(username, product_id) {
+    console.log('Checking if the product is in the cart: ', username, product_id)
+
     try {
         const orderItems = await get_order_items_in_cart(username);
         const products = orderItems.map(orderItem => orderItem.id)
@@ -381,8 +209,10 @@ export async function isProductInCart(username, product_id) {
     }
 }
 
-
+// Get all orders with some status
 export async function get_orders_by_status(status) {
+    console.log('Getting orders by status:', status)
+
     try {
         const ordersSnapshot = await database.ref('orders')
             .orderByChild('status')
@@ -393,13 +223,15 @@ export async function get_orders_by_status(status) {
 
         return Object.values(orders);
     } catch (error) {
-        console.error('Error fetching orders by status:', error);
+        console.error('Error getting orders by status:', error);
         return [];
     }
 }
 
-
+// Get order_items from cart by username
 export async function get_order_items_in_cart(username) {
+    console.log('Getting order items in cart:', username);
+
     try {
         const user = await get_user_by_username(username);
 
@@ -447,7 +279,11 @@ export async function get_order_items_in_cart(username) {
         return [];
     }
 }
+
+// Update count in order_item
 export function updateOrderItemCount(order_item_id, new_count) {
+    console.log('Updating order item count:', order_item_id);
+
     try {
         const orderItemRef = database.ref('order_items').child(order_item_id);
         orderItemRef.update({ count: new_count });
@@ -457,7 +293,10 @@ export function updateOrderItemCount(order_item_id, new_count) {
     }
 }
 
+// Update status of order
 export function updateOrderStatus(order_id, new_status) {
+    console.log('Updating order status:', order_id);
+
     try {
         const orderRef = database.ref('orders').child(order_id);
         orderRef.update({ status: new_status });

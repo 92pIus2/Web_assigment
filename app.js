@@ -14,6 +14,7 @@ import {
     get_order_items_in_cart, get_user_orders, isProductInCart,
     update_cart_status_to_in_progress, updateOrderItemCount, updateOrderStatus
 } from "./database/orders.js";
+import res from "express/lib/response.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -239,6 +240,12 @@ app.post('/update_user_by_username', (req, res) => {
         update_user_by_username(username, newUsername, newPassword)
         req.session.username = newUsername;
     }
+});
+
+app.post('/log_out', (req, res) => {
+    req.session.loggedin = false;
+    req.session.username = '';
+    res.redirect('/content')
 });
 
 app.post('/api/proceed_order', async(req, res) => {

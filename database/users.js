@@ -1,23 +1,11 @@
+import {create} from "./create.js";
 
-import firebase from "firebase/compat/app";
-import {} from "firebase/compat/database";
+const database = create();
 
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyAORF8cH1QIAuYICrYMtgAwb5UCz4OKgxQ",
-    authDomain: "webvinyl-4912c.firebaseapp.com",
-    databaseURL: "https://webvinyl-4912c-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "webvinyl-4912c",
-    storageBucket: "webvinyl-4912c.appspot.com",
-    messagingSenderId: "1017529934891",
-    appId: "1:1017529934891:web:7d3448757b9bc14376b66e",
-    measurementId: "G-KDPE4VBBJM"
-};
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-// Add a user to Firebase
+// Add a user to Database
 export function add_user(email, username, password) {
+    console.log('Adding user: ', email, username)
+
     const usersRef = database.ref('users');
 
     usersRef.push({
@@ -33,8 +21,10 @@ export function add_user(email, username, password) {
     });
 }
 
-// Update user by username in Firebase
+// Update user by username
 export function update_user_by_username(username, new_username, new_password) {
+    console.log('Updating user: ', username)
+    
     const usersRef = database.ref('users');
 
     usersRef.orderByChild('username').equalTo(username).once('value', snapshot => {
@@ -53,26 +43,10 @@ export function update_user_by_username(username, new_username, new_password) {
     });
 }
 
-// Delete user by username or email from Firebase
-export function delete_user(identifier) {
-    const usersRef = database.ref('users');
-    const isEmail = identifier.includes('@');
-
-    usersRef.orderByChild(isEmail ? 'email' : 'username').equalTo(identifier).once('value', snapshot => {
-        snapshot.forEach(userSnapshot => {
-            userSnapshot.ref.remove((error) => {
-                if (error) {
-                    console.error('Error deleting user:', error);
-                } else {
-                    console.log('User deleted successfully');
-                }
-            });
-        });
-    });
-}
-
-// Retrieve user by username from Firebase
+// Get user by username
 export function get_user_by_username(username) {
+    console.log('Getting user: ', username)
+    
     return new Promise((resolve, reject) => {
         const usersRef = database.ref('users');
 
@@ -90,27 +64,10 @@ export function get_user_by_username(username) {
     });
 }
 
-// Retrieve user by email from Firebase
-export function get_user_by_email(email) {
-    return new Promise((resolve, reject) => {
-        const usersRef = database.ref('users');
-
-        usersRef.orderByChild('email').equalTo(email).once('value', snapshot => {
-            const user = snapshot.val();
-            if (user) {
-                resolve(Object.values(user)[0]);
-            } else {
-                resolve(null);
-            }
-        }, error => {
-            console.error('Error getting user:', error);
-            reject(error);
-        });
-    });
-}
-
-// Check if the provided password matches the stored password for the given username
+// Check password of user
 export function checkPassword(username, password) {
+    console.log('Checking password of user: ', username)
+    
     return new Promise((resolve, reject) => {
         const usersRef = database.ref('users');
 

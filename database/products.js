@@ -1,44 +1,26 @@
+import {create} from "./create.js";
 
-import firebase from "firebase/compat/app";
-import {} from "firebase/compat/database";
+const database = create();
 
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyAORF8cH1QIAuYICrYMtgAwb5UCz4OKgxQ",
-    authDomain: "webvinyl-4912c.firebaseapp.com",
-    databaseURL: "https://webvinyl-4912c-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "webvinyl-4912c",
-    storageBucket: "webvinyl-4912c.appspot.com",
-    messagingSenderId: "1017529934891",
-    appId: "1:1017529934891:web:7d3448757b9bc14376b66e",
-    measurementId: "G-KDPE4VBBJM"
-};
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-// Add a product to Firebase
+// Add a product to Database
 export async function add_product(artist, album, price, genre, image) {
+    console.log('Adding product:', artist, album, price, genre);
+
     try {
         const productsRef = database.ref('products');
-
-        // Retrieve existing product data
         const productsSnapshot = await productsRef.once('value');
         const existingProducts = productsSnapshot.val() || {};
 
-        // Find the maximum existing product ID
-        let maxProductId = 0;
+        let maxProductId = 0; //finding new ID
         for (const productId in existingProducts) {
             const numericId = parseInt(productId);
             if (!isNaN(numericId) && numericId > maxProductId) {
                 maxProductId = numericId;
             }
         }
-
-        // Calculate the new product ID
         const newProductId = maxProductId + 1;
-        console.log(newProductId)
 
-        // Add the new product with the calculated ID
+        // Add the new product
         productsRef.child(newProductId).set({
             id : newProductId,
             artist: artist,
@@ -58,26 +40,7 @@ export async function add_product(artist, album, price, genre, image) {
     }
 }
 
-
-
-// Update a product in Firebase
-export function update_product(id, new_artist, new_album, new_price, new_genre) {
-    const productRef = database.ref('products').child(id);
-
-    productRef.update({
-        artist: new_artist,
-        album: new_album,
-        price: new_price,
-        genre: new_genre
-    }, (error) => {
-        if (error) {
-            console.error('Error updating product:', error);
-        } else {
-            console.log('Product updated successfully');
-        }
-    });
-}
-
+// Delete product from Database
 export function delete_product(id) {
     console.log('Deleting product with ID:', id);
 
@@ -92,9 +55,10 @@ export function delete_product(id) {
     })
 }
 
-
-// Get a product by its ID from Firebase
+// Get a product by ID
 export function get_product_by_id(id) {
+    console.log('Getting product:', id);
+
     return new Promise((resolve, reject) => {
         const productRef = database.ref('products').child(id);
 
@@ -108,38 +72,10 @@ export function get_product_by_id(id) {
     });
 }
 
-// Get products by artist from Firebase
-export function get_products_by_artist(artist) {
-    return new Promise((resolve, reject) => {
-        const productsRef = database.ref('products');
-
-        productsRef.orderByChild('artist').equalTo(artist).once('value', snapshot => {
-            const products = snapshot.val();
-            resolve(Object.values(products));
-        }, error => {
-            console.error('Error getting products by artist:', error);
-            reject(error);
-        });
-    });
-}
-
-// Get products by genre from Firebase
-export function get_products_by_genre(genre) {
-    return new Promise((resolve, reject) => {
-        const productsRef = database.ref('products');
-
-        productsRef.orderByChild('genre').equalTo(genre).once('value', snapshot => {
-            const products = snapshot.val();
-            resolve(Object.values(products));
-        }, error => {
-            console.error('Error getting products by genre:', error);
-            reject(error);
-        });
-    });
-}
-
-// Get all products from Firebase
+// Get all products
 export function get_all_products() {
+    console.log('Getting all products');
+
     return new Promise((resolve, reject) => {
         const productsRef = database.ref('products');
 
@@ -152,5 +88,3 @@ export function get_all_products() {
         });
     });
 }
-
-//add_product('Morgenshtern', 'Last One', 30, 'Hip-Hop', 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Solid_black.svg/548px-Solid_black.svg.png')
