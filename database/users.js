@@ -1,9 +1,10 @@
 import {create} from "./create.js";
+import {compareStringToHash, hashPassword} from "./hash.js";
 
 const database = create();
 
 // Add a user to Database
-export function add_user(email, username, password) {
+export async function add_user(email, username, password) {
     console.log('Adding user: ', email, username)
 
     const usersRef = database.ref('users');
@@ -11,7 +12,7 @@ export function add_user(email, username, password) {
     usersRef.push({
         email: email,
         username: username,
-        password: password
+        password: await hashPassword(password)
     }, (error) => {
         if (error) {
             console.error('Error adding user:', error);
@@ -27,11 +28,11 @@ export function update_user_by_username(username, new_username, new_password) {
     
     const usersRef = database.ref('users');
 
-    usersRef.orderByChild('username').equalTo(username).once('value', snapshot => {
-        snapshot.forEach(userSnapshot => {
+    usersRef.orderByChild('username').equalTo(username).once('value', async snapshot => {
+        for (const userSnapshot of snapshot) {
             userSnapshot.ref.update({
                 username: new_username,
-                password: new_password
+                password: await hashPassword(new_password)
             }, (error) => {
                 if (error) {
                     console.error('Error updating user:', error);
@@ -39,7 +40,7 @@ export function update_user_by_username(username, new_username, new_password) {
                     console.log('User updated successfully');
                 }
             });
-        });
+        }
     });
 }
 
@@ -75,11 +76,7 @@ export function checkPassword(username, password) {
             const user = snapshot.val();
             if (user) {
                 const userData = Object.values(user)[0];
-                if (userData.password === password) {
-                    resolve(true);
-                } else {
-                    resolve(false);
-                }
+                resolve(compareStringToHash(password, userData.password))
             } else {
                 resolve(false);
             }
