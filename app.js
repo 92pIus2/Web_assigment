@@ -8,7 +8,12 @@ import {fileURLToPath} from "url";
 
 import {delete_order_item} from "./database/order_items.js";
 import {add_user, checkPassword, get_user_by_username, update_user_by_username} from "./database/users.js";
-import {add_product, delete_product, get_all_products} from "./database/products.js";
+import {
+    add_product,
+    delete_product,
+    get_all_products,
+    get_product_by_id
+} from "./database/products.js";
 import {
     add_product_to_cart, get_in_progress_orders,
     get_order_items_in_cart, get_user_orders, isProductInCart,
@@ -79,6 +84,15 @@ app.get('/api/items', (req, res) => {
     });
 });
 
+app.get('/api/item/:itemId', (req, res) => {
+    get_product_by_id(req.params.itemId).then((product) => {
+        console.log(product); // Log the retrieved product
+        res.json(product);
+    }).catch((error) => {
+        console.error(error); // Handle any errors
+    });
+});
+
 app.get('/registration', (req, res) => {
     res.render('registration');
 });
@@ -119,6 +133,14 @@ app.get('/admin/products', (req, res) => {
     } else {
         res.redirect('/content');
     }
+});
+
+app.get('/content/:itemId', (req, res) => {
+    const itemId = req.params.itemId;
+    res.render('item_page', {
+        loggedIn: req.session.loggedin,
+        itemId: itemId
+    });
 });
 
 app.delete('/api/admin/:itemId', (req, res) => {

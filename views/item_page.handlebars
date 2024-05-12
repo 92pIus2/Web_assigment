@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap"
+        rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+        crossorigin="anonymous">
+
+  <title>Product page</title>
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      font-size: xx-large;
+      background-color: #FFB6C1;
+      background-size: cover;
+      background-position: top center;
+      background-repeat: no-repeat;
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .row {
+      width: 100%;
+    }
+
+
+    .row.align-items-center {
+      min-height: 50px;
+    / / Ensure the row has a minimum height if content is less
+    }
+
+
+    .btn-primary {
+      background-color: #FF91A4;
+      border-color: #FF91A4;
+      color: #FFF;
+    }
+
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+      background-color: #FFB6C1;
+      border-color: #FFB6C1;
+      color: #FFF;
+    }
+
+    .container {
+      padding: 10px;
+      margin-top: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #FF69B4;
+    }
+
+    table {
+      display: flex;
+      flex-wrap: wrap;
+      border-collapse: separate;
+      border-spacing: 20px;
+      margin-top: 20px;
+      table-layout: auto;
+    }
+
+    th, td {
+      background: rgb(255, 255, 255);
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: none;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+      color: #FF69B4;
+    }
+
+    td {
+      color: #FF69B4;
+    }
+
+    .quantity-selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .navbar {
+      background-color: #FF1493;
+    }
+
+    .invert {
+      filter: invert(1);
+    }
+
+    .page-item .page-link {
+      color: #FF91A4;
+    }
+
+    .page-item .page-link:hover {
+      color: #FF91A4;
+    }
+
+    .page-item.active .page-link {
+      background-color: #FF91A4;
+      border-color: #FF91A4;
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img class="invert" id="LOGO" src="../template.png" alt="LOGO" draggable="false" height="60"/>
+    </a>
+    <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="navbarCollapse" style="">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        {{#unless loggedIn}}
+          <li class="nav-item">
+            <a class="nav-link" href="/sign_in">Log in</a>
+          </li>
+        {{else}}
+          <li class="nav-item">
+            <a class="nav-link" href="/account">Profile</a>
+          </li>
+        {{/unless}}
+        <li class="nav-item">
+          <a class="nav-link" href="/cart">My cart</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container m-5" id="item">
+
+</div>
+</body>
+<script>
+  let itemData;
+
+  function addItemInfo() {
+    const body = document.querySelector('#item');
+    body.innerHTML = '';
+    const item = itemData;
+
+    body.innerHTML = `
+        <div class="card text-center" style="background-color: #f4d0d6; box-shadow: rgb(146,124,147) 0px 22px 70px 4px; display: flex; flex-direction: row; align-items: center; padding: 20px;">
+            <div style="flex: 1;">
+                <img width="450" src=${item.image} alt="Card image cap" style="object-fit: cover; max-width: 100%; height: auto;">
+            </div>
+            <div style="flex: 2; padding: 20px;">
+                <p> BORN PINK[Standard CD Boxset – Version A / PINK] </p>
+                <p style="font-size: 0.8em;"><strong>${item.artist}</strong></p>
+                <h5>${item.genre}</h5>
+                <div class="quantity-selector">
+                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', -1)">-</button>
+                    <span class="mx-2" id="quantity${item.id}">1</span>
+                    <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', 1)">+</button>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="row">
+                        <div class="col-4">
+                            <p class="card-text" style="font-size: 0.9em">${item.price} €</p>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-success" style="width: 100%" id="add" onclick="addToCart('${item.id}', document.getElementById('quantity${item.id}').textContent)">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+  }
+
+
+  function changeQuantity(selectorId, change) {
+    const quantityElement = document.getElementById(selectorId);
+    let quantity = parseInt(quantityElement.textContent);
+    if (!isNaN(quantity)) {
+      quantity += change;
+      if (quantity < 1) quantity = 1;
+      quantityElement.textContent = quantity;
+    }
+  }
+
+  function addToCart(itemId, quantity) {
+    if (isNaN(quantity) || quantity <= 0) {
+      alert('Invalid quantity. Please enter a valid number greater than 0.');
+      return;
+    }
+
+    fetch('/add_to_cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'id': itemId,
+        'count': quantity
+      }),
+    })
+    .then(response => response.json())
+    .then(response => alert(response.message))
+    .catch(error => console.log(error));
+  }
+
+  fetch('/api/item/{{itemId}}')
+  .then(response => response.json())
+  .then(data => {
+    itemData = data;
+    addItemInfo();
+  })
+  .catch(error => console.log(error));
+</script>
+</html>

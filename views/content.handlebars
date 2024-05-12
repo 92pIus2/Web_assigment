@@ -167,18 +167,18 @@
     </div>
 </nav>
 
-<div class="container m-3">
+<div class="container-fluid m-3">
   <div class="row align-items-center"> <!-- Added align-items-center here -->
     <div class="col-10">
       <div class="d-flex justify-content-between">
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('all')">All Genres</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('metal')">Metal</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('hip-hop')">Hip-Hop</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('pop')">Pop</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('house')">House</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('r&b')">R&B</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('rock')">Rock</button>
-        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('jazz')">Jazz</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('all')">All groups</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('BLACKPINK')">BLACKPINK</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('BTS')">BTS</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('Aespa')">Aespa</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('NewJeans')">NewJeans</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('TxT')">TxT</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('Ateez')">Ateez</button>
+        <button class="btn btn-primary genre-btn flex-grow-1" onclick="filterItems('Le Sserafim')">Le Sserafim</button>
       </div>
     </div>
     <div class="col-2 d-flex justify-content-end"> <!-- Removed align-items-center -->
@@ -188,7 +188,7 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" onclick="sortItemsByPrice()">Price</a></li>
-          <li><a class="dropdown-item" onclick="sortItemsByArtist()">Artist name</a></li>
+          <li><a class="dropdown-item" onclick="sortItemsByArtist()">Name</a></li>
         </ul>
       </div>
     </div>
@@ -200,7 +200,7 @@
     <ul class="pagination justify-content-center" id="pagination">
     </ul>
     <div class="container mt-5">
-        <h1 class="text-center mb-4" style="color: #492c21">Recent News:</h1>
+        <h1 class="text-center mb-4" style="color: #492c21">Don't miss this:</h1>
         <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -210,8 +210,8 @@
                         </div>
                         <div class="col-md-8">
                             <div class="carousel-caption" style="color: #492c21">
-                                <h3>Summer Sale!</h3>
-                                <p>Get ready for the hottest deals of the season. Enjoy massive discounts on your favorite music albums.</p>
+                                <h3>Mid-Season Sale!</h3>
+                                <p>Enjoy massive discounts on your favorite items! Don't forget to check the best deals!</p>
                             </div>
                         </div>
                     </div>
@@ -224,7 +224,7 @@
                         <div class="col-md-8">
                             <div class="carousel-caption" style="color: #492c21">
                                 <h3>New Arrivals</h3>
-                                <p>Discover the latest music releases from top artists. Shop now to stay updated with the best music trends.</p>
+                                <p>Discover the latest released items from your favorite groups. Delivered from South Korea in the shortest time possible.</p>
                             </div>
                         </div>
                     </div>
@@ -291,12 +291,12 @@
             const item = items[i];
             cell.className = 'col-xxl-3 col-xl-4 col-lg-4 col-md-9 col-sm-12 col-xs-12 m-3';
             cell.innerHTML = `
-            <div class="card text-center" style="background-color: #e9dfb1; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
-            <img class="card-img-top p-3" src=${item.image} alt="Card image cap" style="object-fit: cover">
+            <div class="card text-center" style="background-color: #f4d0d6; box-shadow: rgb(146,124,147) 0px 22px 70px 4px;">
+            <a href="/content/${item.id}"><img class="card-img-top p-3" src=${item.image} alt="Card image cap" style="object-fit: cover"></a>
             <div class="card-body">
-                <h5 class="card-title" style="font-size: 0.6em;"><strong>${item.album}</strong></h5>
+                <h5 class="card-text">${item.album}</h5>
                 <p class="card-text" style="font-size: 0.8em;"><strong>${item.artist}</strong></p>
-                <p class="card-text">${item.genre}</p>
+                <h5 class="card-text">${item.genre}</h5>
                 <div class="quantity-selector">
                     <button class="btn btn-primary" onclick="changeQuantity('quantity${item.id}', -1)">-</button>
                     <span class="mx-2" id="quantity${item.id}">1</span>
@@ -322,7 +322,7 @@
     // Initialize items on page load
     // Filter items by genre
     function filterItems(genre) {
-        const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre);
+        const filteredItems = itemsData.filter(item => genre === 'all' || item.genre.toLowerCase() === genre.toLowerCase());
         currentData = filteredItems;
 
         const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
