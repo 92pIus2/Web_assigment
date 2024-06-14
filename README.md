@@ -1,2 +1,2 @@
 # Web_assigment
-the best web hw
+Web e-commerce example
